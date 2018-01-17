@@ -10,14 +10,14 @@ authors:
   - Ian Carroll
 
 # Slides
+
+slide_sorter:
   - intro
   - tiers
   - scrape
   - api
   - census
   - conclude  
-
-slide_sorter:
 
 #####################################
 # Only modify content above or risk #
