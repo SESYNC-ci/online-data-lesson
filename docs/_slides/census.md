@@ -27,7 +27,7 @@ c.acs5
 ~~~
 {:.input}
 ~~~
-Out[1]: <census.core.ACS5Client at 0x10e8fd400>
+Out[1]: <census.core.ACS5Client at 0x109026f60>
 ~~~
 {:.output}
 
@@ -5105,7 +5105,7 @@ gg.ggplot(df, aes) + gg.geom_boxplot()
 ~~~
 {:.input}
 ~~~
-Out[1]: <ggplot: (284008035)>
+Out[1]: <ggplot: (-9223372036576587327)>
 ~~~
 {:.output}
 
