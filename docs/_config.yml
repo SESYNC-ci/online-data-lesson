@@ -31,6 +31,7 @@ reveal: https://cdn.rawgit.com/hakimel/reveal.js/3.5.0
 
 # Jekyll
 
+github: [metadata]
 markdown: kramdown
 collections:
   - slides
