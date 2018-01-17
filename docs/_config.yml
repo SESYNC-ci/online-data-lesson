@@ -1,13 +1,21 @@
 # Site
 
-title:
+title: Web Services and APIs with Python
 handouts:
-tag:
-lesson:
-instructor:
+ - worksheet.ipynb
+tag: v0.0
+lesson: 7
+instructor: Ian Carroll
 authors:
+  - Ian Carroll
 
 # Slides
+  - intro
+  - tiers
+  - scrape
+  - api
+  - census
+  - conclude  
 
 slide_sorter:
 
