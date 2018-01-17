@@ -65,7 +65,9 @@ Pages designed for humans are increasingly harder to parse programmatically.
 - Javascript often needs to be executed by the client
 - The HTML `<table>` is drifting into obscurity (mostly for the better)
 
-### HTML Tables
+===
+
+## HTML Tables
 
 Sites with easilly accessible html tables nowadays may be specifically geared toward
 non-human agents. The US Census provides some documentation for their
