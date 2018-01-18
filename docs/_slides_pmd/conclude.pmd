@@ -1,7 +1,7 @@
 ---
 ---
 
-## Takeaway
+## Take-away
 
 - Web scraping is hard and unreliable
   - but sometimes there is no other option

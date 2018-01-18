@@ -41,7 +41,7 @@ a fair job, while making no attempt to "render" a human readable page.
 from bs4 import BeautifulSoup
 
 doc = BeautifulSoup(response.text, 'lxml')
-doc
+print('\n'.join(doc.prettify().splitlines()[0:10]))
 ~~~
 {:.input}
 ~~~
@@ -122,7 +122,7 @@ data services in a massive such table:
 ~~~python
 import pandas as pd
 
-# oh, no! then census broke!
+# oh, no! the census broke!
 #acs1_variables = pd.read_html('https://api.census.gov/data/2016/acs/acs1/profile/variables.html')
 
 failed_banks = pd.read_html(

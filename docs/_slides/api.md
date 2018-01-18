@@ -11,10 +11,10 @@ data via their API at <https://api.census.gov>.
 
 ===
 
-The **I** in **API** is the all the buttons and dials on a black box,
-it's the same **I** that's in **GUI**. Instead of interfacing with a
-user, those buttons and dials are meant for another software
-application.
+The **I** in **API** is all the buttons and dials on the same kind of
+black box you need a **GUI** for (it's the same **I**).  Instead of
+interfacing with a user, those buttons and dials are meant for another
+software application.
 
 In the case of the Census, the main component of the application is
 some relational database management system. There probabably are
@@ -25,12 +25,13 @@ Census API is meant for communication between your program
 
 ===
 
+Inspect [this URL](https://api.census.gov/data/2015/acs5?get=NAME,AIANHH&for=county&in=state:24#irrelevant) in your browser.
+
 In a RESTful web service, the already universal system for
 transferring data over the internet, known as HTTP is half of the
 interface. All you really need is documentation for how to construct
 the URL in a standards compliant way that the service will accept.
-
-<https://api.census.gov/data/2015/acs5?get=NAME,AIANHH&for=county&in=state:24#irrelevant>
+{:.notes}
 
 ===
 
@@ -68,12 +69,17 @@ Out[1]: <Response [200]>
 
 
 
+===
+
 ## Interpretting the response
 
-The response from the API is a bunch of `0`s and `1`s, but part of the
-HTTP protocol is to include a "header" with information about reading the body.
+The response from the API is a bunch of 0s and 1s, but part of the
+HTTP protocol is to include a "header" with information about how
+to decode the body of the response.
 
-Most REST APIs return in the "body":
+===
+
+Most REST APIs return in the "body" on of these:
 
 - Javascript Object Notation (JSON)
   - a UTF-8 encoded string of key-value pairs, where values may be lists
@@ -83,7 +89,7 @@ Most REST APIs return in the "body":
 
 ===
 
-The header states the content type in the reply is JSON.
+The header from Census says the content type is JSON.
 
 
 ~~~python
@@ -99,7 +105,7 @@ Access-Control-Allow-Methods: GET,POST
 Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
 Content-Type: application/json;charset=utf-8
 Transfer-Encoding: chunked
-Date: Wed, 17 Jan 2018 23:45:45 GMT
+Date: Thu, 18 Jan 2018 01:21:00 GMT
 Strict-Transport-Security: max-age=31536000
 ~~~
 {:.output}
@@ -157,10 +163,11 @@ Most servers request good behavior, others enforce it.
 - Rate of queries (calls per second, or per day)
 - User credentials specified by an API key
 
+===
+
 ## From the Census Bureau
 
->[**What Are the Query Limits?**](https://www.census.gov/data/developers/guidance/api-user-guide.Query_Components.html)
->
+[**What Are the Query Limits?**](https://www.census.gov/data/developers/guidance/api-user-guide.Query_Components.html)
+
 >You can include up to 50 variables in a single API query and can make up to 500 queries per IP address per day...
->
 >Please keep in mind that all queries from a business or organization having multiple employees might employ a proxy service or firewall. This will make all of the users of that business or organization appear to have the same IP address.

@@ -6,7 +6,9 @@
 
 ## Specialized Packages
 
-The third tier of access to online data is the most convenient, if it exists: a dedicated package in your programming language's repository ([PyPI](http://pypi.python.org) or [CRAN](http://cran.r-project.org)).
+The third tier of access to online data is the most convenient, if it
+exists: a dedicated package in your programming language's repository
+([PyPI](http://pypi.python.org) or [CRAN](http://cran.r-project.org)).
 
 - Additional guidance on query parameters
 - Returns data in native formats
@@ -14,8 +16,8 @@ The third tier of access to online data is the most convenient, if it exists: a 
 
 ===
 
-The [census](){:.pylib} package is a user contributed suite of tools that streamline
-access to the API.
+The [census](){:.pylib} package is a user contributed suite of tools
+that streamline access to the API.
 
 
 ~~~python
@@ -27,7 +29,7 @@ c.acs5
 ~~~
 {:.input}
 ~~~
-Out[1]: <census.core.ACS5Client at 0x109026f60>
+Out[1]: <census.core.ACS5Client at 0x1122fc4a8>
 ~~~
 {:.output}
 
@@ -35,28 +37,38 @@ Out[1]: <census.core.ACS5Client at 0x109026f60>
 
 ===
 
-Compare to using the API directly via the [requests](){:.pylib} package:
+Compared to using the API directly via the [requests](){:.pylib} package:
 
-Pro
-: More concise code, quicker development
-: Package documentation (if present) is usually more user friendly than API documentaion.
-: May allow seemless update if API changes
+**Pros**
+- More concise code, quicker development
+- Package documentation (if present) is usually more user friendly than API documentaion.
+- May allow seemless update if API changes
 
-Con
-: No guarantee of updates
-: Possibly limited in scope
+**Cons**
+- No guarantee of updates
+- Possibly limited in scope
 
 ===
 
-Query the Census ACS5 survey for the variable `B19001_001` and each entity's `NAME`.
+Query the Census ACS5 survey for the variable `B19001_001E` and each entity's `NAME`.
 
 
 ~~~python
 variables = ('NAME', 'B19001_001E')
 params = {
   'for': 'tract:*',
-  'in':'state:24',
+  'in': 'state:24',
 }
+~~~
+{:.input}
+
+
+===
+
+The [census](){:.pylib} package converts the JSON string into a Python dictionary. (No need to check headers.)
+
+
+~~~python
 response = c.acs5.get(variables, params)
 response
 ~~~
@@ -5071,7 +5083,7 @@ Out[1]:
 
 ===
 
-The JSON response is easilly cast into a Pandas `DataFrame`.
+The Pandas usual `DataFrame()` constructor 
 
 
 ~~~python
@@ -5094,7 +5106,7 @@ dtype: object
 
 ===
 
-And here's our old friend from Tuesday ...
+And here's a simple plot, which R users should be happy to see:
 
 
 ~~~python
@@ -5105,8 +5117,8 @@ gg.ggplot(df, aes) + gg.geom_boxplot()
 ~~~
 {:.input}
 ~~~
-Out[1]: <ggplot: (-9223372036576587327)>
+Out[1]: <ggplot: (-9223372036567267135)>
 ~~~
 {:.output}
 
-![]({{ site.baseurl }}/images/census_figure5_1.png)\
+
