@@ -41,7 +41,7 @@ a fair job, while making no attempt to "render" a human readable page.
 from bs4 import BeautifulSoup
 
 doc = BeautifulSoup(response.text, 'lxml')
-print('\n'.join(doc.prettify().splitlines()[0:10]))
+doc
 ~~~
 {:.input}
 ~~~
