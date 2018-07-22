@@ -90,14 +90,14 @@ failed_banks = pd.read_html(
 <!--
 ===
 
-```{python eval = False}
+```{python eval = FALSE}
 acs5_variables = acs5_variables[0]
 acs5_variables.head()
 ```
 
 ===
 
-```{python eval = False}
+```{python eval = FALSE}
 rows = acs5_variables['Concept'].str.contains('Household Income', na = False)
 acs5_variables.loc[rows,]
 ```

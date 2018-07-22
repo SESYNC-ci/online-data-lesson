@@ -33,13 +33,111 @@ a fair job, while making no attempt to "render" a human readable page.
 
 
 
+~~~python
+> from bs4 import BeautifulSoup
++ doc = BeautifulSoup(response.text, 'lxml')
++ print('\n'.join(doc.prettify().splitlines()[0:10]))
+~~~
 
 
 
+~~~
+{:.output}<!DOCTYPE html>
+<html>
+ <head>
+  <link href="/s/b0dcca.css" rel="stylesheet" title="Default" type="text/css"/>
+  <title>
+   xkcd: Server Attention Span
+  </title>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <link href="/s/919f27.ico" rel="shortcut icon" type="image/x-icon"/>
+  <link href="/s/919f27.ico" rel="icon" type="image/x-icon"/>
+~~~
 
 
 
+===
+
+Searching the document for desired content is the hard part. This search
+uses a CSS query, to find the image below a section of the document with
+attribute `id = comic`.
 
 
 
+~~~python
+> img = doc.select('#comic > img')
++ img
+~~~
 
+
+
+===
+
+It makes sense to query by CSS if the content being scraped always appears
+the same in a browser; stylesheets are separate from delivered content.
+
+
+
+~~~python
+> img[0]['title']
+~~~
+
+
+
+===
+
+## Range of complexity
+
+Pages designed for humans are increasingly harder to parse programmatically.
+
+- Servers provide different responses based on client "metadata"
+- Javascript often needs to be executed by the client
+- The HTML `<table>` is drifting into obscurity (mostly for the better)
+
+===
+
+## HTML Tables
+
+Sites with easilly accessible html tables nowadays may be specifically geared toward
+non-human agents. The US Census provides some documentation for their
+data services in a massive such table:
+
+<http://api.census.gov/data/2015/acs5/variables.html>
+
+===
+
+
+
+~~~python
+> import pandas as pd
++ # oh, no! the census broke!
++ #acs1_variables = pd.read_html('https://api.census.gov/data/2016/acs/acs1/profile/variables.html')
++ failed_banks = pd.read_html(
++   'https://www.fdic.gov/bank/individual/failed/banklist.html')
+~~~
+
+
+
+<!--
+===
+
+
+
+~~~python
+> acs5_variables = acs5_variables[0]
++ acs5_variables.head()
+~~~
+
+
+
+===
+
+
+
+~~~python
+> rows = acs5_variables['Concept'].str.contains('Household Income', na = False)
++ acs5_variables.loc[rows,]
+~~~
+
+
+-->

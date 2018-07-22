@@ -15,7 +15,7 @@ slide_sorter:
   - intro
   - tiers
   - scrape
-#  - api
+  - api
 #  - census
 #  - conclude  
 

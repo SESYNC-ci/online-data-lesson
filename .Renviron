@@ -1,2 +1,2 @@
 GEM_HOME=~/.gem
-RETICULATE_PYTHON=/usr/local/bin/python3
+RETICULATE_PYTHON=~/env/bin/python

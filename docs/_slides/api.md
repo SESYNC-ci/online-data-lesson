@@ -3,7 +3,6 @@
 
 
 
-
 ## REST API
 
 The US Census Burea provides access to its vast stores of demographic
@@ -51,21 +50,17 @@ the URL in a standards compliant way that the service will accept.
 ===
 
 
+
 ~~~python
-path = 'https://api.census.gov/data/2015/acs5'
-query = {
-  'get': 'NAME,AIANHH',
-  'for': 'county',
-  'in': 'state:24',
-}
-response = requests.get(path, params=query)
-response
+> path = 'https://api.census.gov/data/2015/acs5'
++ query = {
++   'get': 'NAME,AIANHH',
++   'for': 'county',
++   'in': 'state:24',
++ }
++ response = requests.get(path, params=query)
++ response
 ~~~
-{:.input}
-~~~
-Out[1]: <Response [200]>
-~~~
-{:.output}
 
 
 
@@ -91,67 +86,17 @@ Most REST APIs return in the "body" on of these:
 
 The header from Census says the content type is JSON.
 
-
-~~~python
+```python
 for k, v in response.headers.items():
     print('{}: {}'.format(k, v))
-~~~
-{:.input}
-~~~
-Server: Apache-Coyote/1.1
-Cache-Control: max-age=60, must-revalidate
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET,POST
-Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
-Content-Type: application/json;charset=utf-8
-Transfer-Encoding: chunked
-Date: Thu, 18 Jan 2018 01:21:00 GMT
-Strict-Transport-Security: max-age=31536000
-~~~
-{:.output}
-
-
+```
 
 ===
 
-
-~~~python
+```python
 data = pd.read_json(response.content)
 data
-~~~
-{:.input}
-~~~
-Out[1]: 
-                                   0       1      2       3
-0                               NAME  AIANHH  state  county
-1          Allegany County, Maryland    None     24     001
-2      Anne Arundel County, Maryland    None     24     003
-3         Baltimore County, Maryland    None     24     005
-4           Calvert County, Maryland    None     24     009
-5          Caroline County, Maryland    None     24     011
-6           Carroll County, Maryland    None     24     013
-7             Cecil County, Maryland    None     24     015
-8           Charles County, Maryland    None     24     017
-9        Dorchester County, Maryland    None     24     019
-10        Frederick County, Maryland    None     24     021
-11          Garrett County, Maryland    None     24     023
-12          Harford County, Maryland    None     24     025
-13           Howard County, Maryland    None     24     027
-14             Kent County, Maryland    None     24     029
-15       Montgomery County, Maryland    None     24     031
-16  Prince George's County, Maryland    None     24     033
-17     Queen Anne's County, Maryland    None     24     035
-18       St. Mary's County, Maryland    None     24     037
-19         Somerset County, Maryland    None     24     039
-20           Talbot County, Maryland    None     24     041
-21       Washington County, Maryland    None     24     043
-22         Wicomico County, Maryland    None     24     045
-23        Worcester County, Maryland    None     24     047
-24          Baltimore city, Maryland    None     24     510
-~~~
-{:.output}
-
-
+```
 
 ===
 

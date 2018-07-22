@@ -1,8 +1,8 @@
 ---
 ---
 
-```{python, echo = False}
-import requests
+```{python, echo = FALSE}
+#import requests
 import pandas as pd
 ```
 
@@ -52,7 +52,7 @@ the URL in a standards compliant way that the service will accept.
 
 ===
 
-```python
+```{python}
 path = 'https://api.census.gov/data/2015/acs5'
 query = {
   'get': 'NAME,AIANHH',
