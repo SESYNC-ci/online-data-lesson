@@ -15,9 +15,9 @@ slide_sorter:
   - intro
   - tiers
   - scrape
-  - api
-  - census
-  - conclude  
+#  - api
+#  - census
+#  - conclude  
 
 #####################################
 # Only modify content above or risk #

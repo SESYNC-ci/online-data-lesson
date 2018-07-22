@@ -15,7 +15,7 @@ long as it knows the protocol.
 The [requests](){:.pylib} package provides a simple interface to
 issueing HTTP requests and handling the response.
 
-```python
+```{python title = '{{ site.handouts[0] }}'}
 import requests
 
 response = requests.get('https://xkcd.com/869')
@@ -28,7 +28,7 @@ The response is still binary, it takes a browser-like
 parser to translate the raw content into an HTML document. [BeautifulSoup](){:.pylib} does
 a fair job, while making no attempt to "render" a human readable page.
 
-```python
+```{python}
 from bs4 import BeautifulSoup
 
 doc = BeautifulSoup(response.text, 'lxml')
@@ -41,7 +41,7 @@ Searching the document for desired content is the hard part. This search
 uses a CSS query, to find the image below a section of the document with
 attribute `id = comic`.
 
-```python
+```{python}
 img = doc.select('#comic > img')
 img
 ```
@@ -51,7 +51,7 @@ img
 It makes sense to query by CSS if the content being scraped always appears
 the same in a browser; stylesheets are separate from delivered content.
 
-```python
+```{python}
 img[0]['title']
 ```
 
@@ -77,7 +77,7 @@ data services in a massive such table:
 
 ===
 
-```python
+```{python}
 import pandas as pd
 
 # oh, no! the census broke!
@@ -90,14 +90,14 @@ failed_banks = pd.read_html(
 <!--
 ===
 
-```{python, evaluate = False}
+```{python eval = False}
 acs5_variables = acs5_variables[0]
 acs5_variables.head()
 ```
 
 ===
 
-```{python, evaluate = False}
+```{python eval = False}
 rows = acs5_variables['Concept'].str.contains('Household Income', na = False)
 acs5_variables.loc[rows,]
 ```
