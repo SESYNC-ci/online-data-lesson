@@ -8,6 +8,7 @@ load, is to limit the number of records a single API request can
 return. The user ends up having to flip through "pages" with the API,
 handling the response content at each iteration. Options for stashing
 data are:
+{:.notes}
 
 1. Store it all in memory, write to file at the end.
 1. Append each response to a file, writing frequently.
@@ -234,7 +235,7 @@ record you want the response to begin with. Insert the documents (the
 key:value pairs stored in `values`) in bulk to the database with
 `engine.execute()`.
 
-
+===
 
 ~~~python
 for i in range(0, 15):

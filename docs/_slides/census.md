@@ -42,6 +42,8 @@ Compared to using the API directly via the [requests](){:.pylib} package:
 - Package documentation (if present) is usually more user friendly than API documentaion.
 - May allow seemless update if API changes
 
+===
+
 **Cons**
 - No guarantee of updates
 - Possibly limited in scope

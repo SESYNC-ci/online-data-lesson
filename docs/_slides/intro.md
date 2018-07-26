@@ -15,6 +15,7 @@
 - Request data through a REST API
 - Use the [census](){:.pylib} package to aquire data
 
+===
 <!--
 - requests, html, "scraping"
 - api, parameters, key's and rules
