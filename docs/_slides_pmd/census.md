@@ -16,22 +16,13 @@ exists: a dedicated package in your programming language's repository
 The [census](){:.pylib} package is a user contributed suite of tools
 that streamline access to the API.
 
-
-~~~python
+```{python title="{{ site.handouts }}"}
 from census import Census
 
 key = None
 c = Census(key, year=2016)
 c.acs5
-~~~
-{:.text-document title="{{ site.handouts }}"}
-
-~~~
-<census.core.ACS5Client at 0x1148c50f0>
-~~~
-{:.output}
-
-
+```
 
 ===
 
@@ -51,21 +42,16 @@ Compared to using the API directly via the [requests](){:.pylib} package:
 Query the Census ACS5 survey for the variable `B19001_001E` and each
 entity's `NAME`.
 
-
-~~~python
+```{python title="{{ site.handouts }}"}
 variables = ('NAME', 'B19013_001E')
-~~~
-{:.text-document title="{{ site.handouts }}"}
-
-
+```
 
 ===
 
 The [census](){:.pylib} package converts the JSON string into a Python
 dictionary. (No need to check headers.)
 
-
-~~~python
+```{python title="{{ site.handouts }}"}
 response = c.acs5.state_county_tract(
     variables,
     '24',
@@ -73,42 +59,24 @@ response = c.acs5.state_county_tract(
     Census.ALL
     )
 response[0]
-~~~
-{:.text-document title="{{ site.handouts }}"}
-
-~~~
-
-{'NAME': 'Census Tract 1, Allegany County, Maryland',
- 'B19013_001E': 42292.0,
- 'state': '24',
- 'county': '001',
- 'tract': '000100'}
-~~~
-{:.output}
-
-
+```
 
 ===
 
 The Pandas `DataFrame()` constructor will accept the list of
 dictionaries as the sole argument, taking column names from "keys".
 
-
-~~~python
+```{python title="{{ site.handouts }}"}
 df = pd.DataFrame(response)
 mask = df['B19013_001E'] == -666666666.0
 df = df.loc[~mask, :]
-~~~
-{:.text-document title="{{ site.handouts }}"}
-
-
+```
 
 ===
 
 The [seaborn](){:.pylib} package provides some nice, quick visualizations.
 
-
-~~~python
+```{python, include = False}
 import seaborn as sns
 
 sns.boxplot(
@@ -116,11 +84,4 @@ sns.boxplot(
   x = 'county',
   y = 'B19013_001E',
 )
-~~~
-{:.input title="Console"}
-~~~
-<matplotlib.axes._subplots.AxesSubplot at 0x11357d0f0>
-~~~
-{:.output}
-
-
+```

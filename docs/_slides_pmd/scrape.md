@@ -1,0 +1,112 @@
+---
+---
+
+## Requests
+
+That "http" at the beginning of the URL for a possible data source is
+a protocol---an understanding between a client and a server about how
+to communicate. The client does not have to be a web browser, so long
+as it knows the protocol. After all, [servers exist to
+serve](https://xkcd.com/869/).
+
+===
+
+The [requests](){:.pylib} package provides a simple interface to
+issueing HTTP requests and handling the response.
+
+```{python title="{{ site.handouts[0] }}"}
+import requests
+
+response = requests.get('https://xkcd.com/869')
+response
+```
+
+===
+
+The response is still binary, it takes a browser-like parser to
+translate the raw content into an HTML
+document. [BeautifulSoup](){:.pylib} does a fair job, while making no
+attempt to "render" a human readable page.
+
+```{python title="{{ site.handouts[0] }}"}
+from bs4 import BeautifulSoup
+
+doc = BeautifulSoup(response.text, 'lxml')
+print('\n'.join(doc.prettify().splitlines()[0:10]))
+```
+
+===
+
+Searching the document for desired content is the hard part. This search
+uses a CSS query, to find the image below a section of the document with
+attribute `id = comic`.
+
+```{python title="{{ site.handouts[0] }}"}
+img = doc.select('#comic > img').pop()
+img
+```
+
+===
+
+It makes sense to query by CSS if the content being scraped always appears
+the same in a browser; stylesheets are separate from delivered content.
+
+```{python title="{{ site.handouts[0] }}"}
+from textwrap import fill
+
+print(fill(img['title'], width = 42))
+```
+
+===
+
+## Was that so bad?
+
+Pages designed for humans are increasingly harder to parse programmatically.
+
+- Servers provide different responses based on client "metadata"
+- Javascript often needs to be executed by the client
+- The HTML `<table>` is drifting into obscurity (mostly for the better)
+
+===
+
+## HTML Tables
+
+Sites with easilly accessible html tables nowadays may be specifically
+geared toward non-human agents. The US Census provides some
+documentation for their data services in a massive such table:
+
+<http://api.census.gov/data/2015/acs5/variables.html>
+
+===
+
+```{python title="{{ site.handouts[0] }}"}
+import pandas as pd
+
+acs5_variables = pd.read_html(
+    'https://api.census.gov/data/2016/acs/acs5/variables.html'
+    )
+vars = acs5_variables[0]
+vars.head()
+```
+
+<!--
+failed_banks = pd.read_html(
+  'https://www.fdic.gov/bank/individual/failed/banklist.html')
+-->
+
+===
+
+We can use our data manipulation tools to search this unwieldy
+documentation for variables of interest
+
+```{python}
+rows = (
+    vars['Label']
+    .str.contains(
+        'household income',
+        na = False,
+        )
+    )
+for idx, row in vars.loc[rows].iterrows():
+    print('{}:\t{}'.format(row['Name'], row['Label']))
+```

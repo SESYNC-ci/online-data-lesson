@@ -1,24 +1,15 @@
 ---
 ---
 
-## Why script data aquistion?
-
-- Too time intensive to aquire manually
-- Integrate updated or new data
-- Reproducibility
-- There's an API between you and the data
-
-===
-
-## Objectives for this lesson
+## Lesson Objectives
 
 - Distinguish three sources for online data
 - Understand how HTTP and web-services work
-- Learn Python ideoms for requesting data
+- Learn Python idioms for requesting data
 
 ===
 
-## Specific achievements
+## Specific Achievements
 
 - Programatically aquire data embedded in a web page
 - Request data through a REST API
@@ -29,3 +20,10 @@
 - api, parameters, key's and rules
 - Census package as a python api, google earth example JS and Python API?
 -->
+
+## Why script data aquistion?
+
+- Too time intensive to aquire manually
+- Integrate updated or new data
+- Reproducibility
+- There's an API between you and the data

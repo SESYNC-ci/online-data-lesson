@@ -1,11 +1,6 @@
 ---
 ---
 
-```{python, echo = False}
-import requests
-import pandas as pd
-```
-
 ## REST API
 
 The US Census Burea provides access to its vast stores of demographic
@@ -27,7 +22,7 @@ Census API is meant for communication between your program
 
 ===
 
-Inspect [this URL](https://api.census.gov/data/2015/acs5?get=NAME,AIANHH&for=county&in=state:24#irrelevant) in your browser.
+Inspect [this URL](https://api.census.gov/data/2015/acs5?get=NAME&for=county&in=state:24#irrelephant){:target="_blank"} in your browser.
 
 In a RESTful web service, the already universal system for
 transferring data over the internet, known as HTTP is half of the
@@ -38,26 +33,29 @@ the URL in a standards compliant way that the service will accept.
 ===
 
 | Section           | Description                                                             |
+|-------------------+-------------------------------------------------------------------------|
 | `https://`        | **scheme**                                                              |
 | `api.census.gov`  | **authority**, or simply host if there's no user authentication         |
 | `/data/2015/acs5` | **path** to a resource within a hierarchy                               |
+|-------------------+-------------------------------------------------------------------------|
 | `?`               | beginning of the **query** component of a URL                           |
-| `get=NAME,AIANHH` | first query parameter                                                   |
+| `get=NAME`        | first query parameter                                                   |
 | `&`               | query parameter separator                                               |
 | `for=county`      | second query parameter                                                  |
 | `&`               | query parameter separator                                               |
 | `in=state:*`      | third query parameter                                                   |
+|-------------------+-------------------------------------------------------------------------|
 | `#`               | beginning of the **fragment** component of a URL                        |
 | `irrelevant`      | the fragment is a client side pointer, it isn't even sent to the server |
 
 ===
 
-```python
-path = 'https://api.census.gov/data/2015/acs5'
+```{python title="{{ site.handouts[0] }}"}
+path = 'https://api.census.gov/data/2016/acs/acs5'
 query = {
-  'get': 'NAME,AIANHH',
-  'for': 'county',
-  'in': 'state:24',
+  'get':'NAME,B19013_001E',
+  'for':'tract:*',
+  'in':'state:24',
 }
 response = requests.get(path, params=query)
 response
@@ -65,7 +63,7 @@ response
 
 ===
 
-## Interpretting the response
+## Response Header
 
 The response from the API is a bunch of 0s and 1s, but part of the
 HTTP protocol is to include a "header" with information about how
@@ -73,28 +71,33 @@ to decode the body of the response.
 
 ===
 
-Most REST APIs return in the "body" on of these:
+Most REST APIs return as the "content" either:
 
-- Javascript Object Notation (JSON)
+1. Javascript Object Notation (JSON)
   - a UTF-8 encoded string of key-value pairs, where values may be lists
   - e.g. `{'a':24, 'b': ['x', 'y', 'z']}`
-- eXtensible Markup Language (XML)
-  - hierarchy of `<tag></tag>`s that do the same thing
+1. eXtensible Markup Language (XML)
+  - a nested `<tag></tag>` hierarchy serving the same purpose
 
 ===
 
 The header from Census says the content type is JSON.
 
-```python
+```{python title="{{ site.handouts[0] }}"}
 for k, v in response.headers.items():
     print('{}: {}'.format(k, v))
 ```
 
 ===
 
-```python
+## Response Content
+
+Use a JSON reader to extract a Python object. To read it into
+a Panda's `DataFrame`, use Panda's `read_json`.
+
+```{python title="{{ site.handouts[0] }}"}
 data = pd.read_json(response.content)
-data
+data.head()
 ```
 
 ===
@@ -109,9 +112,11 @@ Most servers request good behavior, others enforce it.
 
 ===
 
-## From the Census Bureau
+From the Census FAQ [What Are the Query Limits?](https://www.census.gov/data/developers/guidance/api-user-guide.Query_Components.html):
 
-[**What Are the Query Limits?**](https://www.census.gov/data/developers/guidance/api-user-guide.Query_Components.html)
-
->You can include up to 50 variables in a single API query and can make up to 500 queries per IP address per day...
->Please keep in mind that all queries from a business or organization having multiple employees might employ a proxy service or firewall. This will make all of the users of that business or organization appear to have the same IP address.
+>You can include up to 50 variables in a single API query and can make
+>up to 500 queries per IP address per day...  Please keep in mind that
+>all queries from a business or organization having multiple employees
+>might employ a proxy service or firewall. This will make all of the
+>users of that business or organization appear to have the same IP
+>address.

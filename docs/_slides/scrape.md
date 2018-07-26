@@ -4,11 +4,10 @@
 ## Requests
 
 That "http" at the beginning of the URL for a possible data source is
-a protocol&mdash;an understanding between a client and a server about
-how to communicate. The client does not have to be a web browser, so
-long as it knows the protocol.
-
-[Servers exist to serve, after all.](https://xkcd.com/869/)
+a protocol---an understanding between a client and a server about how
+to communicate. The client does not have to be a web browser, so long
+as it knows the protocol. After all, [servers exist to
+serve](https://xkcd.com/869/).
 
 ===
 
@@ -22,9 +21,10 @@ import requests
 response = requests.get('https://xkcd.com/869')
 response
 ~~~
-{:.input}
+{:.text-document title="{{ site.handouts[0] }}"}
+
 ~~~
-Out[1]: <Response [200]>
+<Response [200]>
 ~~~
 {:.output}
 
@@ -32,29 +32,31 @@ Out[1]: <Response [200]>
 
 ===
 
-The response is still binary, it takes a browser-like
-parser to translate the raw content into an HTML document. [BeautifulSoup](){:.pylib} does
-a fair job, while making no attempt to "render" a human readable page.
+The response is still binary, it takes a browser-like parser to
+translate the raw content into an HTML
+document. [BeautifulSoup](){:.pylib} does a fair job, while making no
+attempt to "render" a human readable page.
 
 
 ~~~python
 from bs4 import BeautifulSoup
 
 doc = BeautifulSoup(response.text, 'lxml')
-doc
+print('\n'.join(doc.prettify().splitlines()[0:10]))
 ~~~
-{:.input}
+{:.text-document title="{{ site.handouts[0] }}"}
+
 ~~~
 <!DOCTYPE html>
 <html>
  <head>
-  <script>
-   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-25700708-7', 'auto');
+  <link href="/s/b0dcca.css" rel="stylesheet" title="Default" type="text/css"/>
+  <title>
+   xkcd: Server Attention Span
+  </title>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <link href="/s/919f27.ico" rel="shortcut icon" type="image/x-icon"/>
+  <link href="/s/919f27.ico" rel="icon" type="image/x-icon"/>
 ~~~
 {:.output}
 
@@ -68,12 +70,13 @@ attribute `id = comic`.
 
 
 ~~~python
-img = doc.select('#comic > img')
+img = doc.select('#comic > img').pop()
 img
 ~~~
-{:.input}
+{:.text-document title="{{ site.handouts[0] }}"}
+
 ~~~
-Out[1]: [<img alt="Server Attention Span" src="//imgs.xkcd.com/comics/server_attention_span.png" title="They have to keep the adjacent rack units empty. Otherwise, half the entries in their /var/log/syslog are just 'SERVER BELOW TRYING TO START CONVERSATION *AGAIN*.' and 'WISH THEY'D STOP GIVING HIM SO MUCH COFFEE IT SPLATTERS EVERYWHERE.'"/>]
+<img alt="Server Attention Span" src="//imgs.xkcd.com/comics/server_attention_span.png" title="They have to keep the adjacent rack units empty. Otherwise, half the entries in their /var/log/syslog are just 'SERVER BELOW TRYING TO START CONVERSATION *AGAIN*.' and 'WISH THEY'D STOP GIVING HIM SO MUCH COFFEE IT SPLATTERS EVERYWHERE.'"/>
 ~~~
 {:.output}
 
@@ -86,11 +89,19 @@ the same in a browser; stylesheets are separate from delivered content.
 
 
 ~~~python
-img[0]['title']
+from textwrap import fill
+
+print(fill(img['title'], width = 42))
 ~~~
-{:.input}
+{:.text-document title="{{ site.handouts[0] }}"}
+
 ~~~
-Out[1]: "They have to keep the adjacent rack units empty. Otherwise, half the entries in their /var/log/syslog are just 'SERVER BELOW TRYING TO START CONVERSATION *AGAIN*.' and 'WISH THEY'D STOP GIVING HIM SO MUCH COFFEE IT SPLATTERS EVERYWHERE.'"
+They have to keep the adjacent rack units
+empty. Otherwise, half the entries in
+their /var/log/syslog are just 'SERVER
+BELOW TRYING TO START CONVERSATION
+*AGAIN*.' and 'WISH THEY'D STOP GIVING HIM
+SO MUCH COFFEE IT SPLATTERS EVERYWHERE.'
 ~~~
 {:.output}
 
@@ -98,7 +109,7 @@ Out[1]: "They have to keep the adjacent rack units empty. Otherwise, half the en
 
 ===
 
-## Range of complexity
+## Was that so bad?
 
 Pages designed for humans are increasingly harder to parse programmatically.
 
@@ -110,9 +121,9 @@ Pages designed for humans are increasingly harder to parse programmatically.
 
 ## HTML Tables
 
-Sites with easilly accessible html tables nowadays may be specifically geared toward
-non-human agents. The US Census provides some documentation for their
-data services in a massive such table:
+Sites with easilly accessible html tables nowadays may be specifically
+geared toward non-human agents. The US Census provides some
+documentation for their data services in a massive such table:
 
 <http://api.census.gov/data/2015/acs5/variables.html>
 
@@ -122,33 +133,140 @@ data services in a massive such table:
 ~~~python
 import pandas as pd
 
-# oh, no! the census broke!
-#acs1_variables = pd.read_html('https://api.census.gov/data/2016/acs/acs1/profile/variables.html')
-
-failed_banks = pd.read_html(
-  'https://www.fdic.gov/bank/individual/failed/banklist.html')
+acs5_variables = pd.read_html(
+    'https://api.census.gov/data/2016/acs/acs5/variables.html'
+    )
+vars = acs5_variables[0]
+vars.head()
 ~~~
-{:.input}
+{:.text-document title="{{ site.handouts[0] }}"}
+
+~~~
+
+          Name                                              Label  ...     Group Values
+0       AIANHH                                   FIPS AIANHH code  ...       NaN    NaN
+1      AIHHTLI  American Indian Trust Land/Hawaiian Home Land ...  ...       NaN    NaN
+2       AITSCE          American Indian Tribal Subdivision (FIPS)  ...       NaN    NaN
+3         ANRC          Alaska Native Regional Corporation (FIPS)  ...       NaN    NaN
+4  B00001_001E                                    Estimate!!Total  ...    B00001    NaN
+
+[5 rows x 9 columns]
+~~~
+{:.output}
+
 
 
 <!--
-===
-
-
-~~~python
-acs5_variables = acs5_variables[0]
-acs5_variables.head()
-~~~
-{:.input}
-
-
-===
-
-
-~~~python
-rows = acs5_variables['Concept'].str.contains('Household Income', na = False)
-acs5_variables.loc[rows,]
-~~~
-{:.input}
-
+failed_banks = pd.read_html(
+  'https://www.fdic.gov/bank/individual/failed/banklist.html')
 -->
+
+===
+
+We can use our data manipulation tools to search this unwieldy
+documentation for variables of interest
+
+
+~~~python
+rows = (
+    vars['Label']
+    .str.contains(
+        'household income',
+        na = False,
+        )
+    )
+for idx, row in vars.loc[rows].iterrows():
+    print('{}:\t{}'.format(row['Name'], row['Label']))
+~~~
+{:.input title="Console"}
+~~~
+B19013_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013A_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013B_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013C_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013D_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013E_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013F_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013G_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013H_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013I_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025A_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025B_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025C_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025D_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025E_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025F_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025G_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025H_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025I_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19049_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Total
+B19049_002E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder under 25 years
+B19049_003E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder 25 to 44 years
+B19049_004E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder 45 to 64 years
+B19049_005E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder 65 years and over
+B19050_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19050_002E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder under 25 years
+B19050_003E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder 25 to 44 years
+B19050_004E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder 45 to 64 years
+B19050_005E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder 65 years and over
+B19202_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202A_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202B_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202C_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202D_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202E_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202F_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202G_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202H_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202I_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19214_001E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19215_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Total (dollars)
+B19215_002E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Total (dollars)
+B19215_003E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Living alone!!Total (dollars)
+B19215_004E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Living alone!!Householder 15 to 64 years (dollars)
+B19215_005E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Living alone!!Householder 65 years and over (dollars)
+B19215_006E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Not living alone!!Total (dollars)
+B19215_007E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Not living alone!!Householder 15 to 64 years (dollars)
+B19215_008E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Not living alone!!Householder 65 years and over (dollars)
+B19215_009E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Total (dollars)
+B19215_010E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Living alone!!Total (dollars)
+B19215_011E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Living alone!!Householder 15 to 64 years (dollars)
+B19215_012E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Living alone!!Householder 65 years and over (dollars)
+B19215_013E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Not living alone!!Total (dollars)
+B19215_014E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Not living alone!!Householder 15 to 64 years (dollars)
+B19215_015E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Not living alone!!Householder 65 years and over (dollars)
+B19216_001E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19216_002E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)
+B19216_003E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)!!Living alone (dollars)
+B19216_004E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)!!Living alone (dollars)!!Householder 15 to 64 years (dollars)
+B19216_005E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)!!Living alone (dollars)!!Householder 65 years and over (dollars)
+B19216_006E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)!!Not living alone (dollars)
+B19216_007E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)!!Not living alone (dollars)!!Householder 15 to 64 years (dollars)
+B19216_008E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)!!Not living alone (dollars)!!Householder 65 years and over (dollars)
+B19216_009E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)
+B19216_010E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)!!Living alone (dollars)
+B19216_011E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)!!Living alone (dollars)!!Householder 15 to 64 years (dollars)
+B19216_012E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)!!Living alone (dollars)!!Householder 65 years and over (dollars)
+B19216_013E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)!!Not living alone (dollars)
+B19216_014E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)!!Not living alone (dollars)!!Householder 15 to 64 years (dollars)
+B19216_015E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)!!Not living alone (dollars)!!Householder 65 years and over (dollars)
+B25071_001E:	Estimate!!Median gross rent as a percentage of household income
+B25092_001E:	Estimate!!Median selected monthly owner costs as a percentage of household income in the past 12 months!!Total
+B25092_002E:	Estimate!!Median selected monthly owner costs as a percentage of household income in the past 12 months!!Housing units with a mortgage
+B25092_003E:	Estimate!!Median selected monthly owner costs as a percentage of household income in the past 12 months!!Housing units without a mortgage
+B25099_001E:	Estimate!!Median household income!!Total
+B25099_002E:	Estimate!!Median household income!!Total!!Median household income for units with a mortgage
+B25099_003E:	Estimate!!Median household income!!Total!!Median household income for units without a mortgage
+B25119_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Total
+B25119_002E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Owner occupied (dollars)
+B25119_003E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Renter occupied (dollars)
+B25120_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B25120_002E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Owner occupied
+B25120_003E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Owner occupied!!Housing units with a mortgage
+B25120_004E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Owner occupied!!Housing units without a mortgage
+B25120_005E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Renter occupied
+~~~
+{:.output}
+
+

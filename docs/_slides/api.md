@@ -1,9 +1,6 @@
 ---
 ---
 
-
-
-
 ## REST API
 
 The US Census Burea provides access to its vast stores of demographic
@@ -25,7 +22,7 @@ Census API is meant for communication between your program
 
 ===
 
-Inspect [this URL](https://api.census.gov/data/2015/acs5?get=NAME,AIANHH&for=county&in=state:24#irrelevant) in your browser.
+Inspect [this URL](https://api.census.gov/data/2015/acs5?get=NAME&for=county&in=state:24#irrelephant){:target="_blank"} in your browser.
 
 In a RESTful web service, the already universal system for
 transferring data over the internet, known as HTTP is half of the
@@ -36,15 +33,18 @@ the URL in a standards compliant way that the service will accept.
 ===
 
 | Section           | Description                                                             |
+|-------------------+-------------------------------------------------------------------------|
 | `https://`        | **scheme**                                                              |
 | `api.census.gov`  | **authority**, or simply host if there's no user authentication         |
 | `/data/2015/acs5` | **path** to a resource within a hierarchy                               |
+|-------------------+-------------------------------------------------------------------------|
 | `?`               | beginning of the **query** component of a URL                           |
-| `get=NAME,AIANHH` | first query parameter                                                   |
+| `get=NAME`        | first query parameter                                                   |
 | `&`               | query parameter separator                                               |
 | `for=county`      | second query parameter                                                  |
 | `&`               | query parameter separator                                               |
 | `in=state:*`      | third query parameter                                                   |
+|-------------------+-------------------------------------------------------------------------|
 | `#`               | beginning of the **fragment** component of a URL                        |
 | `irrelevant`      | the fragment is a client side pointer, it isn't even sent to the server |
 
@@ -52,18 +52,19 @@ the URL in a standards compliant way that the service will accept.
 
 
 ~~~python
-path = 'https://api.census.gov/data/2015/acs5'
+path = 'https://api.census.gov/data/2016/acs/acs5'
 query = {
-  'get': 'NAME,AIANHH',
-  'for': 'county',
-  'in': 'state:24',
+  'get':'NAME,B19013_001E',
+  'for':'tract:*',
+  'in':'state:24',
 }
 response = requests.get(path, params=query)
 response
 ~~~
-{:.input}
+{:.text-document title="{{ site.handouts[0] }}"}
+
 ~~~
-Out[1]: <Response [200]>
+<Response [200]>
 ~~~
 {:.output}
 
@@ -71,7 +72,7 @@ Out[1]: <Response [200]>
 
 ===
 
-## Interpretting the response
+## Response Header
 
 The response from the API is a bunch of 0s and 1s, but part of the
 HTTP protocol is to include a "header" with information about how
@@ -79,13 +80,13 @@ to decode the body of the response.
 
 ===
 
-Most REST APIs return in the "body" on of these:
+Most REST APIs return as the "content" either:
 
-- Javascript Object Notation (JSON)
+1. Javascript Object Notation (JSON)
   - a UTF-8 encoded string of key-value pairs, where values may be lists
   - e.g. `{'a':24, 'b': ['x', 'y', 'z']}`
-- eXtensible Markup Language (XML)
-  - hierarchy of `<tag></tag>`s that do the same thing
+1. eXtensible Markup Language (XML)
+  - a nested `<tag></tag>` hierarchy serving the same purpose
 
 ===
 
@@ -96,7 +97,8 @@ The header from Census says the content type is JSON.
 for k, v in response.headers.items():
     print('{}: {}'.format(k, v))
 ~~~
-{:.input}
+{:.text-document title="{{ site.handouts[0] }}"}
+
 ~~~
 Server: Apache-Coyote/1.1
 Cache-Control: max-age=60, must-revalidate
@@ -105,7 +107,7 @@ Access-Control-Allow-Methods: GET,POST
 Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
 Content-Type: application/json;charset=utf-8
 Transfer-Encoding: chunked
-Date: Thu, 18 Jan 2018 01:21:00 GMT
+Date: Thu, 26 Jul 2018 11:09:26 GMT
 Strict-Transport-Security: max-age=31536000
 ~~~
 {:.output}
@@ -114,40 +116,26 @@ Strict-Transport-Security: max-age=31536000
 
 ===
 
+## Response Content
+
+Use a JSON reader to extract a Python object. To read it into
+a Panda's `DataFrame`, use Panda's `read_json`.
+
 
 ~~~python
 data = pd.read_json(response.content)
-data
+data.head()
 ~~~
-{:.input}
+{:.text-document title="{{ site.handouts[0] }}"}
+
 ~~~
-Out[1]: 
-                                   0       1      2       3
-0                               NAME  AIANHH  state  county
-1          Allegany County, Maryland    None     24     001
-2      Anne Arundel County, Maryland    None     24     003
-3         Baltimore County, Maryland    None     24     005
-4           Calvert County, Maryland    None     24     009
-5          Caroline County, Maryland    None     24     011
-6           Carroll County, Maryland    None     24     013
-7             Cecil County, Maryland    None     24     015
-8           Charles County, Maryland    None     24     017
-9        Dorchester County, Maryland    None     24     019
-10        Frederick County, Maryland    None     24     021
-11          Garrett County, Maryland    None     24     023
-12          Harford County, Maryland    None     24     025
-13           Howard County, Maryland    None     24     027
-14             Kent County, Maryland    None     24     029
-15       Montgomery County, Maryland    None     24     031
-16  Prince George's County, Maryland    None     24     033
-17     Queen Anne's County, Maryland    None     24     035
-18       St. Mary's County, Maryland    None     24     037
-19         Somerset County, Maryland    None     24     039
-20           Talbot County, Maryland    None     24     041
-21       Washington County, Maryland    None     24     043
-22         Wicomico County, Maryland    None     24     045
-23        Worcester County, Maryland    None     24     047
-24          Baltimore city, Maryland    None     24     510
+
+                                           0            1      2       3       4
+0                                       NAME  B19013_001E  state  county   tract
+1  Census Tract 1, Allegany County, Maryland        42292     24     001  000100
+2  Census Tract 2, Allegany County, Maryland        44125     24     001  000200
+3  Census Tract 3, Allegany County, Maryland        39571     24     001  000300
+4  Census Tract 4, Allegany County, Maryland        39383     24     001  000400
 ~~~
 {:.output}
 
@@ -165,9 +153,11 @@ Most servers request good behavior, others enforce it.
 
 ===
 
-## From the Census Bureau
+From the Census FAQ [What Are the Query Limits?](https://www.census.gov/data/developers/guidance/api-user-guide.Query_Components.html):
 
-[**What Are the Query Limits?**](https://www.census.gov/data/developers/guidance/api-user-guide.Query_Components.html)
-
->You can include up to 50 variables in a single API query and can make up to 500 queries per IP address per day...
->Please keep in mind that all queries from a business or organization having multiple employees might employ a proxy service or firewall. This will make all of the users of that business or organization appear to have the same IP address.
+>You can include up to 50 variables in a single API query and can make
+>up to 500 queries per IP address per day...  Please keep in mind that
+>all queries from a business or organization having multiple employees
+>might employ a proxy service or firewall. This will make all of the
+>users of that business or organization appear to have the same IP
+>address.
