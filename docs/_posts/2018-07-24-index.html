@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Online Data</title>
+<meta name="description" content="Acquire data from websites and APIs.">
+<link rel="canonical"
+  href="http://cyberhelp.sesync.org/online-data-lesson/course/archive.html">
+<link href="https://cdn.rawgit.com/sesync-ci/lesson-style/v2.0/docs/css/default.css" rel="stylesheet">
+<link href="https://cdn.rawgit.com/sesync-ci/lesson-style/v2.0/docs/css/syntax.css" rel="stylesheet">
+<link href="https://cdn.rawgit.com/sesync-ci/lesson-style/v2.0/docs/css/static.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+    
+
+  </head>
+  <body>
+    <div class="page-content">
+      <div class="wrapper">
+        
+        
+<h1 style="text-transform: none;" id="online-data">Online Data</h1>
+
+<p>Lesson 8 with <em>Ian Carroll</em></p>
+
+<nav id="ToC">
+
+  <ul>
+    <li><a href="#/slides/intro">Lesson Objectives</a></li>
+    <li><a href="#/slides/tiers">Aquiring Online Data</a></li>
+    <li><a href="#/slides/scrape">Requests</a></li>
+    <li><a href="#/slides/api">REST API</a></li>
+    <li><a href="#/slides/census">Specialized Packages</a></li>
+    <li><a href="#/slides/rdbms">Response Stashing</a></li>
+    <li><a href="#/slides/conclude">Takeaway</a></li>
+  </ul>
+</nav>
+
+<hr />
+<p><a name="/slides/intro"></a></p>
+
+<h2 id="lesson-objectives">Lesson Objectives</h2>
+
+<ul>
+  <li>Distinguish three sources for online data</li>
+  <li>Understand how HTTP and web-services work</li>
+  <li>Learn Python idioms for requesting data</li>
+</ul>
+
+<h2 id="specific-achievements">Specific Achievements</h2>
+
+<ul>
+  <li>Programatically aquire data embedded in a web page</li>
+  <li>Request data through a REST API</li>
+  <li>Use the <a href="" class="pylib">census</a> package to aquire data</li>
+</ul>
+
+<p>===
+&lt;!–</p>
+<ul>
+  <li>requests, html, “scraping”</li>
+  <li>api, parameters, key’s and rules</li>
+  <li>Census package as a python api, google earth example JS and Python API?
+–&gt;</li>
+</ul>
+
+<h2 id="why-script-data-aquistion">Why script data aquistion?</h2>
+
+<ul>
+  <li>Too time intensive to aquire manually</li>
+  <li>Integrate updated or new data</li>
+  <li>Reproducibility</li>
+  <li>There’s an API between you and the data</li>
+</ul>
+
+<p class="ToS"><a href="#/slides/intro">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/tiers"></a></p>
+
+<h2 id="aquiring-online-data">Aquiring Online Data</h2>
+
+<p>Data can be available on the web in many different forms. The difficulty you will have aquiring that data for local analysis depends on which of three approaches you need.</p>
+
+<h2 id="scraping-">Scraping 🙁</h2>
+
+<p>If a web browser can read HTML and JavaScript to display a page, why
+can’t your “bot” read HTML and JavaScript to store the data?</p>
+
+<h2 id="restful-web-services-">RESTful Web Services 😉</h2>
+
+<p>An Application Programming Interface (API, as opposed to a GUI) that
+is compatible with passing data around the web using HTTP. The
+Hyper-text Transfer Protocol may not be the fastest, but it is
+universal (it underpins web browsers, after all).</p>
+
+<h2 id="api-wrapper-">API Wrapper 😂</h2>
+
+<p>Major data providers can justify writing a package, specific to your
+language of choice (e.g. Python or R), that facilitates accessing the
+data they provide through a web service.</p>
+
+<p class="ToS"><a href="#/slides/tiers">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/scrape"></a></p>
+
+<h2 id="requests">Requests</h2>
+
+<p>That “http” at the beginning of the URL for a possible data source is
+a protocol—an understanding between a client and a server about how
+to communicate. The client does not have to be a web browser, so long
+as it knows the protocol. After all, <a href="https://xkcd.com/869/">servers exist to
+serve</a>.</p>
+
+<p>The <a href="" class="pylib">requests</a> package provides a simple interface to
+issueing HTTP requests and handling the response.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://xkcd.com/869'</span><span class="p">)</span>
+<span class="n">response</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;Response [200]&gt;
+</code></pre></div></div>
+
+<p>The response is still binary, it takes a browser-like parser to
+translate the raw content into an HTML
+document. <a href="" class="pylib">BeautifulSoup</a> does a fair job, while making no
+attempt to “render” a human readable page.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+<span class="n">doc</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s">'lxml'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">prettify</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]))</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+ <span class="nt">&lt;head&gt;</span>
+  <span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">"/s/b0dcca.css"</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">title=</span><span class="s">"Default"</span> <span class="na">type=</span><span class="s">"text/css"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;title&gt;</span>
+   xkcd: Server Attention Span
+  <span class="nt">&lt;/title&gt;</span>
+  <span class="nt">&lt;meta</span> <span class="na">content=</span><span class="s">"IE=edge"</span> <span class="na">http-equiv=</span><span class="s">"X-UA-Compatible"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">"/s/919f27.ico"</span> <span class="na">rel=</span><span class="s">"shortcut icon"</span> <span class="na">type=</span><span class="s">"image/x-icon"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">"/s/919f27.ico"</span> <span class="na">rel=</span><span class="s">"icon"</span> <span class="na">type=</span><span class="s">"image/x-icon"</span><span class="nt">/&gt;</span>
+</code></pre></div></div>
+
+<p>Searching the document for desired content is the hard part. This search
+uses a CSS query, to find the image below a section of the document with
+attribute <code class="highlighter-rouge">id = comic</code>.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">img</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">'#comic &gt; img'</span><span class="p">)</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+<span class="n">img</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;img alt="Server Attention Span" src="//imgs.xkcd.com/comics/server_attention_span.png" title="They have to keep the adjacent rack units empty. Otherwise, half the entries in their /var/log/syslog are just 'SERVER BELOW TRYING TO START CONVERSATION *AGAIN*.' and 'WISH THEY'D STOP GIVING HIM SO MUCH COFFEE IT SPLATTERS EVERYWHERE.'"/&gt;
+</code></pre></div></div>
+
+<p>It makes sense to query by CSS if the content being scraped always appears
+the same in a browser; stylesheets are separate from delivered content.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">fill</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">fill</span><span class="p">(</span><span class="n">img</span><span class="p">[</span><span class="s">'title'</span><span class="p">],</span> <span class="n">width</span> <span class="o">=</span> <span class="mi">42</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>They have to keep the adjacent rack units
+empty. Otherwise, half the entries in
+their /var/log/syslog are just 'SERVER
+BELOW TRYING TO START CONVERSATION
+*AGAIN*.' and 'WISH THEY'D STOP GIVING HIM
+SO MUCH COFFEE IT SPLATTERS EVERYWHERE.'
+</code></pre></div></div>
+
+<h2 id="was-that-so-bad">Was that so bad?</h2>
+
+<p>Pages designed for humans are increasingly harder to parse programmatically.</p>
+
+<ul>
+  <li>Servers provide different responses based on client “metadata”</li>
+  <li>Javascript often needs to be executed by the client</li>
+  <li>The HTML <code class="highlighter-rouge">&lt;table&gt;</code> is drifting into obscurity (mostly for the better)</li>
+</ul>
+
+<h2 id="html-tables">HTML Tables</h2>
+
+<p>Sites with easilly accessible html tables nowadays may be specifically
+geared toward non-human agents. The US Census provides some
+documentation for their data services in a massive such table:</p>
+
+<p><a href="http://api.census.gov/data/2015/acs5/variables.html">http://api.census.gov/data/2015/acs5/variables.html</a></p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="n">acs5_variables</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span>
+    <span class="s">'https://api.census.gov/data/2016/acs/acs5/variables.html'</span>
+    <span class="p">)</span>
+<span class="nb">vars</span> <span class="o">=</span> <span class="n">acs5_variables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">vars</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+          Name                                              Label  ...     Group Values
+0       AIANHH                                   FIPS AIANHH code  ...       NaN    NaN
+1      AIHHTLI  American Indian Trust Land/Hawaiian Home Land ...  ...       NaN    NaN
+2       AITSCE          American Indian Tribal Subdivision (FIPS)  ...       NaN    NaN
+3         ANRC          Alaska Native Regional Corporation (FIPS)  ...       NaN    NaN
+4  B00001_001E                                    Estimate!!Total  ...    B00001    NaN
+
+[5 rows x 9 columns]
+</code></pre></div></div>
+
+<!--
+failed_banks = pd.read_html(
+  'https://www.fdic.gov/bank/individual/failed/banklist.html')
+-->
+
+<p>We can use our data manipulation tools to search this unwieldy
+documentation for variables of interest</p>
+
+<div class="language-python input highlighter-rouge" title="Console"><div class="highlight"><pre class="highlight"><code><span class="n">rows</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="nb">vars</span><span class="p">[</span><span class="s">'Label'</span><span class="p">]</span>
+    <span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span>
+        <span class="s">'household income'</span><span class="p">,</span>
+        <span class="n">na</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">vars</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rows</span><span class="p">]</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'{}:</span><span class="se">\t</span><span class="s">{}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">'Name'</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s">'Label'</span><span class="p">]))</span>
+</code></pre></div></div>
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>B19013_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013A_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013B_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013C_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013D_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013E_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013F_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013G_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013H_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19013I_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025A_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025B_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025C_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025D_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025E_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025F_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025G_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025H_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19025I_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19049_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Total
+B19049_002E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder under 25 years
+B19049_003E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder 25 to 44 years
+B19049_004E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder 45 to 64 years
+B19049_005E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder 65 years and over
+B19050_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19050_002E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder under 25 years
+B19050_003E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder 25 to 44 years
+B19050_004E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder 45 to 64 years
+B19050_005E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Householder 65 years and over
+B19202_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202A_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202B_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202C_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202D_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202E_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202F_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202G_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202H_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19202I_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19214_001E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19215_001E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Total (dollars)
+B19215_002E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Total (dollars)
+B19215_003E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Living alone!!Total (dollars)
+B19215_004E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Living alone!!Householder 15 to 64 years (dollars)
+B19215_005E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Living alone!!Householder 65 years and over (dollars)
+B19215_006E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Not living alone!!Total (dollars)
+B19215_007E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Not living alone!!Householder 15 to 64 years (dollars)
+B19215_008E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder!!Not living alone!!Householder 65 years and over (dollars)
+B19215_009E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Total (dollars)
+B19215_010E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Living alone!!Total (dollars)
+B19215_011E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Living alone!!Householder 15 to 64 years (dollars)
+B19215_012E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Living alone!!Householder 65 years and over (dollars)
+B19215_013E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Not living alone!!Total (dollars)
+B19215_014E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Not living alone!!Householder 15 to 64 years (dollars)
+B19215_015E:	Estimate!!Median nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder!!Not living alone!!Householder 65 years and over (dollars)
+B19216_001E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B19216_002E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)
+B19216_003E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)!!Living alone (dollars)
+B19216_004E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)!!Living alone (dollars)!!Householder 15 to 64 years (dollars)
+B19216_005E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)!!Living alone (dollars)!!Householder 65 years and over (dollars)
+B19216_006E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)!!Not living alone (dollars)
+B19216_007E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)!!Not living alone (dollars)!!Householder 15 to 64 years (dollars)
+B19216_008E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Male householder (dollars)!!Not living alone (dollars)!!Householder 65 years and over (dollars)
+B19216_009E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)
+B19216_010E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)!!Living alone (dollars)
+B19216_011E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)!!Living alone (dollars)!!Householder 15 to 64 years (dollars)
+B19216_012E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)!!Living alone (dollars)!!Householder 65 years and over (dollars)
+B19216_013E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)!!Not living alone (dollars)
+B19216_014E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)!!Not living alone (dollars)!!Householder 15 to 64 years (dollars)
+B19216_015E:	Estimate!!Aggregate nonfamily household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Female householder (dollars)!!Not living alone (dollars)!!Householder 65 years and over (dollars)
+B25071_001E:	Estimate!!Median gross rent as a percentage of household income
+B25092_001E:	Estimate!!Median selected monthly owner costs as a percentage of household income in the past 12 months!!Total
+B25092_002E:	Estimate!!Median selected monthly owner costs as a percentage of household income in the past 12 months!!Housing units with a mortgage
+B25092_003E:	Estimate!!Median selected monthly owner costs as a percentage of household income in the past 12 months!!Housing units without a mortgage
+B25099_001E:	Estimate!!Median household income!!Total
+B25099_002E:	Estimate!!Median household income!!Total!!Median household income for units with a mortgage
+B25099_003E:	Estimate!!Median household income!!Total!!Median household income for units without a mortgage
+B25119_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Total
+B25119_002E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Owner occupied (dollars)
+B25119_003E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Renter occupied (dollars)
+B25120_001E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)
+B25120_002E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Owner occupied
+B25120_003E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Owner occupied!!Housing units with a mortgage
+B25120_004E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Owner occupied!!Housing units without a mortgage
+B25120_005E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Renter occupied
+</code></pre></div></div>
+
+<p class="ToS"><a href="#/slides/scrape">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/api"></a></p>
+
+<h2 id="rest-api">REST API</h2>
+
+<p>The US Census Burea provides access to its vast stores of demographic
+data via their API at <a href="https://api.census.gov">https://api.census.gov</a>.</p>
+
+<p>The <strong>I</strong> in <strong>API</strong> is all the buttons and dials on the same kind of
+black box you need a <strong>GUI</strong> for (it’s the same <strong>I</strong>).  Instead of
+interfacing with a user, those buttons and dials are meant for another
+software application.</p>
+
+<p class="notes">In the case of the Census, the main component of the application is
+some relational database management system. There probabably are
+several <strong>GUI</strong>s designed for humans to query the Census database; the
+Census API is meant for communication between your program
+(i.e. script) and their application.</p>
+
+<p>Inspect <a href="https://api.census.gov/data/2015/acs5?get=NAME&amp;for=county&amp;in=state:24#irrelephant" target="_blank">this URL</a> in your browser.</p>
+
+<p class="notes">In a RESTful web service, the already universal system for
+transferring data over the internet, known as HTTP is half of the
+interface. All you really need is documentation for how to construct
+the URL in a standards compliant way that the service will accept.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Section</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="highlighter-rouge">https://</code></td>
+      <td><strong>scheme</strong></td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">api.census.gov</code></td>
+      <td><strong>authority</strong>, or simply host if there’s no user authentication</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">/data/2015/acs5</code></td>
+      <td><strong>path</strong> to a resource within a hierarchy</td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr>
+      <td><code class="highlighter-rouge">?</code></td>
+      <td>beginning of the <strong>query</strong> component of a URL</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">get=NAME</code></td>
+      <td>first query parameter</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">&amp;</code></td>
+      <td>query parameter separator</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">for=county</code></td>
+      <td>second query parameter</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">&amp;</code></td>
+      <td>query parameter separator</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">in=state:*</code></td>
+      <td>third query parameter</td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr>
+      <td><code class="highlighter-rouge">#</code></td>
+      <td>beginning of the <strong>fragment</strong> component of a URL</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">irrelevant</code></td>
+      <td>the fragment is a client side pointer, it isn’t even sent to the server</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">path</span> <span class="o">=</span> <span class="s">'https://api.census.gov/data/2016/acs/acs5'</span>
+<span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s">'get'</span><span class="p">:</span><span class="s">'NAME,B19013_001E'</span><span class="p">,</span>
+  <span class="s">'for'</span><span class="p">:</span><span class="s">'tract:*'</span><span class="p">,</span>
+  <span class="s">'in'</span><span class="p">:</span><span class="s">'state:24'</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+<span class="n">response</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;Response [200]&gt;
+</code></pre></div></div>
+
+<h2 id="response-header">Response Header</h2>
+
+<p>The response from the API is a bunch of 0s and 1s, but part of the
+HTTP protocol is to include a “header” with information about how
+to decode the body of the response.</p>
+
+<p>Most REST APIs return as the “content” either:</p>
+
+<ol>
+  <li>Javascript Object Notation (JSON)
+    <ul>
+      <li>a UTF-8 encoded string of key-value pairs, where values may be lists</li>
+      <li>e.g. <code class="highlighter-rouge">{'a':24, 'b': ['x', 'y', 'z']}</code></li>
+    </ul>
+  </li>
+  <li>eXtensible Markup Language (XML)
+    <ul>
+      <li>a nested <code class="highlighter-rouge">&lt;tag&gt;&lt;/tag&gt;</code> hierarchy serving the same purpose</li>
+    </ul>
+  </li>
+</ol>
+
+<p>The header from Census says the content type is JSON.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'{}: {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Server: Apache-Coyote/1.1
+Cache-Control: max-age=60, must-revalidate
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET,POST
+Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
+Content-Type: application/json;charset=utf-8
+Transfer-Encoding: chunked
+Date: Thu, 26 Jul 2018 11:09:26 GMT
+Strict-Transport-Security: max-age=31536000
+</code></pre></div></div>
+
+<h2 id="response-content">Response Content</h2>
+
+<p>Use a JSON reader to extract a Python object. To read it into
+a Panda’s <code class="highlighter-rouge">DataFrame</code>, use Panda’s <code class="highlighter-rouge">read_json</code>.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                                           0            1      2       3       4
+0                                       NAME  B19013_001E  state  county   tract
+1  Census Tract 1, Allegany County, Maryland        42292     24     001  000100
+2  Census Tract 2, Allegany County, Maryland        44125     24     001  000200
+3  Census Tract 3, Allegany County, Maryland        39571     24     001  000300
+4  Census Tract 4, Allegany County, Maryland        39383     24     001  000400
+</code></pre></div></div>
+
+<h2 id="api-keys--limits">API Keys &amp; Limits</h2>
+
+<p>Most servers request good behavior, others enforce it.</p>
+
+<ul>
+  <li>Size of single query</li>
+  <li>Rate of queries (calls per second, or per day)</li>
+  <li>User credentials specified by an API key</li>
+</ul>
+
+<p>From the Census FAQ <a href="https://www.census.gov/data/developers/guidance/api-user-guide.Query_Components.html">What Are the Query Limits?</a>:</p>
+
+<blockquote>
+  <p>You can include up to 50 variables in a single API query and can make
+up to 500 queries per IP address per day…  Please keep in mind that
+all queries from a business or organization having multiple employees
+might employ a proxy service or firewall. This will make all of the
+users of that business or organization appear to have the same IP
+address.</p>
+</blockquote>
+
+<p class="ToS"><a href="#/slides/api">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/census"></a></p>
+
+<h2 id="specialized-packages">Specialized Packages</h2>
+
+<p>The third tier of access to online data is much preferred, if it
+exists: a dedicated package in your programming language’s repository
+(<a href="http://pypi.python.org">PyPI</a> or <a href="http://cran.r-project.org">CRAN</a>).</p>
+
+<ul>
+  <li>Additional guidance on query parameters</li>
+  <li>Returns data in native formats</li>
+  <li>Handles all “encoding” problems</li>
+</ul>
+
+<p>The <a href="" class="pylib">census</a> package is a user contributed suite of tools
+that streamline access to the API.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">census</span> <span class="kn">import</span> <span class="n">Census</span>
+
+<span class="n">key</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">Census</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="mi">2016</span><span class="p">)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">acs5</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;census.core.ACS5Client at 0x1148c50f0&gt;
+</code></pre></div></div>
+
+<p>Compared to using the API directly via the <a href="" class="pylib">requests</a> package:</p>
+
+<p><strong>Pros</strong></p>
+<ul>
+  <li>More concise code, quicker development</li>
+  <li>Package documentation (if present) is usually more user friendly than API documentaion.</li>
+  <li>May allow seemless update if API changes</li>
+</ul>
+
+<p><strong>Cons</strong></p>
+<ul>
+  <li>No guarantee of updates</li>
+  <li>Possibly limited in scope</li>
+</ul>
+
+<p>Query the Census ACS5 survey for the variable <code class="highlighter-rouge">B19001_001E</code> and each
+entity’s <code class="highlighter-rouge">NAME</code>.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">variables</span> <span class="o">=</span> <span class="p">(</span><span class="s">'NAME'</span><span class="p">,</span> <span class="s">'B19013_001E'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The <a href="" class="pylib">census</a> package converts the JSON string into a Python
+dictionary. (No need to check headers.)</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">response</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">acs5</span><span class="o">.</span><span class="n">state_county_tract</span><span class="p">(</span>
+    <span class="n">variables</span><span class="p">,</span>
+    <span class="s">'24'</span><span class="p">,</span>
+    <span class="n">Census</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span>
+    <span class="n">Census</span><span class="o">.</span><span class="n">ALL</span>
+    <span class="p">)</span>
+<span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+{'NAME': 'Census Tract 1, Allegany County, Maryland',
+ 'B19013_001E': 42292.0,
+ 'state': '24',
+ 'county': '001',
+ 'tract': '000100'}
+</code></pre></div></div>
+
+<p>The Pandas <code class="highlighter-rouge">DataFrame()</code> constructor will accept the list of
+dictionaries as the sole argument, taking column names from “keys”.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'B19013_001E'</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mf">666666666.0</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">,</span> <span class="p">:]</span>
+</code></pre></div></div>
+
+<p>The <a href="" class="pylib">seaborn</a> package provides some nice, quick visualizations.</p>
+
+<div class="language-python input highlighter-rouge" title="Console"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span>
+  <span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">,</span>
+  <span class="n">x</span> <span class="o">=</span> <span class="s">'county'</span><span class="p">,</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="s">'B19013_001E'</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div></div>
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11357d0f0&gt;
+</code></pre></div></div>
+
+<p class="ToS"><a href="#/slides/census">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/rdbms"></a></p>
+
+<h2 id="response-stashing">Response Stashing</h2>
+
+<p class="notes">A common strategy that web service providers take to balance their
+load, is to limit the number of records a single API request can
+return. The user ends up having to flip through “pages” with the API,
+handling the response content at each iteration. Options for stashing
+data are:</p>
+
+<ol>
+  <li>Store it all in memory, write to file at the end.</li>
+  <li>Append each response to a file, writing frequently.</li>
+  <li>Offload these decisions to database management software.</li>
+</ol>
+
+<p class="notes">To repeat the exercise below at home, request an API key at
+https://api.data.gov/signup/, and store it in an adjacent <code class="highlighter-rouge">api_key.py</code>
+file with the single variable <code class="highlighter-rouge">API_KEY = your many digit key</code>.</p>
+
+<p>The “data.gov” API provides a case in point. Take a look at the
+<a href="https://www.regulations.gov/docket?D=DOI-2017-0002">request for comments</a>
+posted by the US Department of Interior about Bears Ear National
+Monument. The document received over two million comments, all
+accessible through <a href="https://www.regulations.gov">Regulations.gov</a>.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">api_key</span> <span class="kn">import</span> <span class="n">API_KEY</span>
+
+<span class="n">api</span> <span class="o">=</span> <span class="s">'https://api.data.gov/regulations/v3/'</span>
+<span class="n">path</span> <span class="o">=</span> <span class="s">'document.json'</span>
+<span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'documentId'</span><span class="p">:</span><span class="s">'DOI-2017-0002-0001'</span><span class="p">,</span>
+    <span class="s">'api_key'</span><span class="p">:</span><span class="n">API_KEY</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="n">api</span> <span class="o">+</span> <span class="n">path</span><span class="p">,</span>
+    <span class="n">params</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Extract data from the returned JSON object, which gets mapped to a
+Python dictionary called <code class="highlighter-rouge">doc</code>.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">doc</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'{}: {}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">doc</span><span class="p">[</span><span class="s">'numItemsRecieved'</span><span class="p">][</span><span class="s">'label'</span><span class="p">],</span>
+    <span class="n">doc</span><span class="p">[</span><span class="s">'numItemsRecieved'</span><span class="p">][</span><span class="s">'value'</span><span class="p">],</span>
+<span class="p">))</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Number of Comments Received: 2839046
+</code></pre></div></div>
+
+<p>Initiate a new API query for public submission (PS) comments and print
+the dictionary keys in the response.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'dktid'</span><span class="p">:</span> <span class="n">doc</span><span class="p">[</span><span class="s">'docketId'</span><span class="p">][</span><span class="s">'value'</span><span class="p">],</span>
+    <span class="s">'dct'</span><span class="p">:</span> <span class="s">'PS'</span><span class="p">,</span>
+    <span class="s">'api_key'</span><span class="p">:</span> <span class="n">API_KEY</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="n">path</span> <span class="o">=</span> <span class="s">'documents.json'</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="n">api</span> <span class="o">+</span> <span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+<span class="n">dkt</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>To inspect the return, we can list the keys in the
+parsed <code class="highlighter-rouge">dkt</code>.</p>
+
+<div class="language-python input highlighter-rouge" title="Console"><div class="highlight"><pre class="highlight"><code><span class="nb">list</span><span class="p">(</span><span class="n">dkt</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</code></pre></div></div>
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['documents', 'totalNumRecords']
+</code></pre></div></div>
+
+<p>The purported claimed number of results is much larger than the length
+of the documents array contained in this response.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">'Number received: {}</span><span class="se">\n</span><span class="s">Total number: {}'</span>
+    <span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">dkt</span><span class="p">[</span><span class="s">'documents'</span><span class="p">]),</span>
+        <span class="n">dkt</span><span class="p">[</span><span class="s">'totalNumRecords'</span><span class="p">],</span>
+<span class="p">))</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Number received: 25
+Total number: 782468
+</code></pre></div></div>
+
+<p>The following commands prepare Python to connect to a
+database-in-a-file, and creates empty tables in the database if they
+do not already exist (i.e. it is safe to re-run after you have
+populated the database).</p>
+
+<h3 id="step-1-boilerplate">Step 1: Boilerplate</h3>
+
+<p>The SQLAlchemy package has a lot of features, and
+requires you to be very precise about how to get started.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="step-2-table-definition">Step 2: Table Definition</h3>
+
+<p>Define the tables that are going to live in the database
+using Python classes. For each class, its attributes
+will map to columns in a table.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">Text</span>
+
+<span class="k">class</span> <span class="nc">Comment</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">'comment'</span>
+    
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">comment</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>For each document, we’ll just store the “commentText” found in the API
+response.</p>
+
+<div class="language-python input highlighter-rouge" title="Console"><div class="highlight"><pre class="highlight"><code><span class="n">doc</span> <span class="o">=</span> <span class="n">dkt</span><span class="p">[</span><span class="s">'documents'</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+<span class="n">doc</span><span class="p">[</span><span class="s">'commentText'</span><span class="p">]</span>
+</code></pre></div></div>
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>'I am appalled that our treasured National monuments are up for review at all.  Every single one of our parks, monuments and cultural or historic sites is worthwhile and belongs as a part of the American story. I am adamantly opposed to any effort to eliminate or diminish protections for national monuments and I urge you to support our public lands and waters and recommend that our current national monuments remain protected. The short review you are undertaking makes a mockery of the decades of work that local communities have invested to protect these places for future generations, especially Bears Ears National monument, which is the first on the list for this review. Five Tribal nations, Hopi, Navajo, Uintah and Ouray Ute Indian Tribe, Ute Mountain Ute and Zuni tribes came together, for the first time ever, to protect their shared sacred land by advocating for Bears Ears to be made a national monument. Now the Bears Ears Inter-Tribal Coalition is working to protect the national monument, and maintain its integrity. Hear me, and the overwhelming number of people who agree with me: PUBLIC LANDS BELONG IN PUBLIC HANDS. It is your job as the Secretary of the Dept. of Interior to protect and safeguard our national treasures. Please make sure you side with the people who support national parks, monuments, historical and cultural sites. '
+</code></pre></div></div>
+
+<h3 id="step-3-connect-and-initialize">Step 3: Connect (and Initialize)</h3>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s">'sqlite:///BENM.db'</span><span class="p">)</span>
+<span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>You could inspect the BENM database now using any sqlite3 client: you
+would find one empty “comment” table with fields “id” and “comment”.</p>
+
+<p>Add a new <code class="highlighter-rouge">rpp</code> parameter to request <code class="highlighter-rouge">100</code> documents per page.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">query</span><span class="p">[</span><span class="s">'rpp'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+</code></pre></div></div>
+
+<p>In each request, advance the query parameter <code class="highlighter-rouge">po</code> to the number of the
+record you want the response to begin with. Insert the documents (the
+key:value pairs stored in <code class="highlighter-rouge">values</code>) in bulk to the database with
+<code class="highlighter-rouge">engine.execute()</code>.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">):</span>
+    <span class="n">query</span><span class="p">[</span><span class="s">'po'</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">query</span><span class="p">[</span><span class="s">'rpp'</span><span class="p">]</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s">'po'</span><span class="p">])</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">api</span> <span class="o">+</span> <span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="n">docs</span> <span class="o">=</span> <span class="n">page</span><span class="p">[</span><span class="s">'documents'</span><span class="p">]</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[{</span><span class="s">'comment'</span><span class="p">:</span> <span class="n">doc</span><span class="p">[</span><span class="s">'commentText'</span><span class="p">]}</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">]</span>
+    <span class="n">insert</span> <span class="o">=</span> <span class="n">Comment</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">insert</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+110
+120
+130
+140
+</code></pre></div></div>
+
+<p>View the records in the database by reading
+everyting we have so far back into a <code class="highlighter-rouge">DataFrame</code>.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_table</span><span class="p">(</span><span class="s">'comment'</span><span class="p">,</span> <span class="n">engine</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Don’t forget to disconnect from your database!</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-8.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">engine</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p class="ToS"><a href="#/slides/rdbms">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/conclude"></a></p>
+
+<h2 id="takeaway">Takeaway</h2>
+
+<ul>
+  <li>
+    <p>Web scraping is hard and unreliable, but sometimes there is no other option.</p>
+  </li>
+  <li>
+    <p>RESTful web services are the most common resource.</p>
+  </li>
+  <li>
+    <p>Search <a href="https://pypi.org">PyPI</a> for the specific API you plan to use.</p>
+  </li>
+</ul>
+
+<p class="notes">RESTful web services do not always have great documentation—what
+parameters are acceptable or necessary may not be clear. Some may even
+be poorly documented on purpose, if the API wasn’t designed for public
+use. Even if you plan to aquire data using the “raw” web service, try
+a search for a relevant package on Python. The package documention
+could help.</p>
+
+<p class="ToS"><a href="#/slides/conclude">Top of Section</a></p>
+
+
+
+        <hr>
+
+<p>If you need to catch-up before a section of code will work, just squish it's
+🍅 to copy code above it into your clipboard. Then paste into your interpreter's
+console, run, and you'll be ready to start in on that section. Code copied by
+both 🍅 and 📋 will also appear below, where you can edit first, and then copy,
+paste, and run again.</p>
+
+<div class="output">
+  <pre id="ketchup" contenteditable="true"><code># Nothing here yet!</code></pre>
+</div>
+
+<script>
+$(document).ready(function(){
+  
+  // Add code help icons to code blocks
+  $('.input, .text-document').append('<ul class="code-help">');
+  $('.code-help')
+    .append('<li class="clipboard">📋</li>');
+  $('.text-document:not(.no-eval) .code-help')
+    .append('<li class="ketchup">🍅</li>');
+
+  // Bind copy actions to mouse clicks on icons
+  var $ketchup = $('#ketchup');
+  var rng = document.createRange();
+  var sel = window.getSelection();
+  $('.ketchup').click(function(){
+    var $prev = $(this)
+      .parents('.text-document')
+      .prevAll('.text-document:has(.ketchup)');
+    $ketchup.find('code').text($prev.find('pre').text());
+    rng.selectNodeContents($ketchup[0]);
+    sel.removeAllRanges();
+    sel.addRange(rng);
+    document.execCommand("copy");
+    sel.removeAllRanges();
+  });
+  $('.text-document .clipboard').click(function(){
+    var pre = $(this).parents('.text-document').find('pre').text();
+    $ketchup.find('code').text(pre);
+    rng.selectNodeContents($ketchup[0]);
+    sel.removeAllRanges();
+    sel.addRange(rng);
+    document.execCommand("copy");
+    sel.removeAllRanges();
+  });
+  $('.input .clipboard').click(function(){
+    var pre = $(this).parents('.input').find('pre').text();
+    pre = pre.replace(/(^|\n)> */g, '$1');
+    $ketchup.find('code').text(pre);
+    rng.selectNodeContents($ketchup[0]);
+    sel.removeAllRanges();
+    sel.addRange(rng);
+    document.execCommand("copy");
+    sel.removeAllRanges();
+  });
+});
+</script>
+      </div>
+    </div>
+    <script>
+$(document).ready(function(){
+  // Add links to R and Python package repositories
+  $('a.rlib').map(function(){
+    this.href = 'https://cran.r-project.org/package=' + this.innerText;
+  });
+  $('a.pylib').map(function(){
+    this.href = 'https://pypi.python.org/pypi/' + this.innerText;
+  });
+});
+</script>
+
+  </body>
+</html>
