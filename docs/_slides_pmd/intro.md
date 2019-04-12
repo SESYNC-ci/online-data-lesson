@@ -15,11 +15,7 @@
 - Request data through a REST API
 - Use the [census](){:.pylib} package to aquire data
 
-<!--
-- requests, html, "scraping"
-- api, parameters, key's and rules
-- Census package as a python api, google earth example JS and Python API?
--->
+===
 
 ## Why script data aquistion?
 
