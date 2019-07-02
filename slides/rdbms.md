@@ -28,7 +28,7 @@ accessible through [Regulations.gov](https://www.regulations.gov).
 
 ===
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 import requests
 from api_key import API_KEY
 
@@ -48,7 +48,7 @@ response = requests.get(
 Extract data from the returned JSON object, which gets mapped to a
 Python dictionary called `doc`.
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 doc = response.json()
 print('{}: {}'.format(
     doc['numItemsRecieved']['label'],
@@ -61,7 +61,7 @@ print('{}: {}'.format(
 Initiate a new API query for public submission (PS) comments and print
 the dictionary keys in the response.
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 query = {
     'dktid': doc['docketId']['value'],
     'dct': 'PS',
@@ -86,7 +86,7 @@ The purported claimed number of results is much larger than the length
 of the documents array contained in this response.
 
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 print('Number received: {}\nTotal number: {}'
     .format(
         len(dkt['documents']),
@@ -108,7 +108,7 @@ populated the database).
 The SQLAlchemy package has a lot of features, and
 requires you to be very precise about how to get started.
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -124,7 +124,7 @@ Define the tables that are going to live in the database
 using Python classes. For each class, its attributes
 will map to columns in a table.
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 from sqlalchemy import Column, Integer, Text
 
 class Comment(Base):
@@ -147,7 +147,7 @@ doc['commentText']
 
 ### Step 3: Connect (and Initialize)
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 engine = create_engine('sqlite:///BENM.db')
 Session = sessionmaker(bind=engine)
 
@@ -164,7 +164,7 @@ would find one empty "comment" table with fields "id" and "comment".
 Add a new `rpp` parameter to request `100` documents per page.
 
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 query['rpp'] = 10
 ```
 
@@ -176,7 +176,7 @@ key:value pairs stored in `values`) in bulk to the database with
 `engine.execute()`.
 
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 for i in range(0, 15):
     query['po'] = i * query['rpp']
     print(query['po'])
@@ -193,7 +193,7 @@ for i in range(0, 15):
 View the records in the database by reading
 everyting we have so far back into a `DataFrame`.
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 df = pd.read_sql_table('comment', engine)
 ```
 
@@ -201,6 +201,6 @@ df = pd.read_sql_table('comment', engine)
 
 Don't forget to disconnect from your database!
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 engine.dispose()
 ```

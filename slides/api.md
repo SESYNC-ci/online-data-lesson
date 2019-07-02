@@ -50,7 +50,7 @@ the URL in a standards compliant way that the service will accept.
 
 ===
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 path = 'https://api.census.gov/data/2016/acs/acs5'
 query = {
   'get':'NAME,B19013_001E',
@@ -83,7 +83,7 @@ Most REST APIs return as the "content" either:
 
 The header from Census says the content type is JSON.
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 for k, v in response.headers.items():
     print('{}: {}'.format(k, v))
 ```
@@ -95,7 +95,7 @@ for k, v in response.headers.items():
 Use a JSON reader to extract a Python object. To read it into
 a Panda's `DataFrame`, use Panda's `read_json`.
 
-```{python title="{{ site.handouts[0] }}"}
+```{python title="{{ site.data.lesson.handouts[0] }}"}
 data = pd.read_json(response.content)
 data.head()
 ```

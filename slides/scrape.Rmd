@@ -14,7 +14,7 @@ serve](https://xkcd.com/869/).
 The [requests](){:.pylib} package provides a simple interface to
 issueing HTTP requests and handling the response.
 
-```{python title="{{ site.handouts[0] }}"}
+```{python, handout = 0}
 import requests
 
 response = requests.get('https://xkcd.com/869')
@@ -28,7 +28,7 @@ translate the raw content into an HTML
 document. [BeautifulSoup](){:.pylib} does a fair job, while making no
 attempt to "render" a human readable page.
 
-```{python title="{{ site.handouts[0] }}"}
+```{python, handout = 0}
 from bs4 import BeautifulSoup
 
 doc = BeautifulSoup(response.text, 'lxml')
@@ -41,7 +41,7 @@ Searching the document for desired content is the hard part. This search
 uses a CSS query, to find the image below a section of the document with
 attribute `id = comic`.
 
-```{python title="{{ site.handouts[0] }}"}
+```{python, handout = 1}
 img = doc.select('#comic > img').pop()
 img
 ```
@@ -51,7 +51,7 @@ img
 It makes sense to query by CSS if the content being scraped always appears
 the same in a browser; stylesheets are separate from delivered content.
 
-```{python title="{{ site.handouts[0] }}"}
+```{python, handout = 0}
 from textwrap import fill
 
 print(fill(img['title'], width = 42))
@@ -79,7 +79,7 @@ documentation for their data services in a massive such table:
 
 ===
 
-```{python title="{{ site.handouts[0] }}"}
+```{python, handout = 0}
 import pandas as pd
 
 acs5_variables = pd.read_html(
