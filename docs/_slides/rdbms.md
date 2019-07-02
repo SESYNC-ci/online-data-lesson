@@ -8,7 +8,6 @@ load, is to limit the number of records a single API request can
 return. The user ends up having to flip through "pages" with the API,
 handling the response content at each iteration. Options for stashing
 data are:
-{:.notes}
 
 1. Store it all in memory, write to file at the end.
 1. Append each response to a file, writing frequently.
@@ -30,6 +29,7 @@ accessible through [Regulations.gov](https://www.regulations.gov).
 ===
 
 
+
 ~~~python
 import requests
 from api_key import API_KEY
@@ -44,14 +44,14 @@ response = requests.get(
     api + path,
     params=query)
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
-
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
 
 ===
 
 Extract data from the returned JSON object, which gets mapped to a
 Python dictionary called `doc`.
+
 
 
 ~~~python
@@ -61,7 +61,8 @@ print('{}: {}'.format(
     doc['numItemsRecieved']['value'],
 ))
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
 
 ~~~
 Number of Comments Received: 2839046
@@ -69,11 +70,11 @@ Number of Comments Received: 2839046
 {:.output}
 
 
-
 ===
 
 Initiate a new API query for public submission (PS) comments and print
 the dictionary keys in the response.
+
 
 
 ~~~python
@@ -87,29 +88,31 @@ response = requests.get(
     api + path, params=query)
 dkt = response.json()
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
-
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
 
 To inspect the return, we can list the keys in the
 parsed `dkt`.
 
 
+
 ~~~python
-list(dkt.keys())
+> list(dkt.keys())
 ~~~
-{:.input title="Console"}
+{:title="Console" .input}
+
+
 ~~~
-['documents', 'totalNumRecords']
+['totalNumRecords', 'documents']
 ~~~
 {:.output}
-
 
 
 ===
 
 The purported claimed number of results is much larger than the length
 of the documents array contained in this response.
+
 
 
 
@@ -120,14 +123,14 @@ print('Number received: {}\nTotal number: {}'
         dkt['totalNumRecords'],
 ))
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
 
 ~~~
 Number received: 25
-Total number: 782468
+Total number: 783340
 ~~~
 {:.output}
-
 
 
 ===
@@ -145,15 +148,15 @@ The SQLAlchemy package has a lot of features, and
 requires you to be very precise about how to get started.
 
 
+
 ~~~python
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
-
+{:title="{{ site.data.lesson.handouts[1] }}" .no-eval .text-document}
 
 
 ===
@@ -165,17 +168,26 @@ using Python classes. For each class, its attributes
 will map to columns in a table.
 
 
+
 ~~~python
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, Text
+
+Base = declarative_base()
 
 class Comment(Base):
     __tablename__ = 'comment'
     
     id = Column(Integer, primary_key=True)
     comment = Column(Text)
+    
+engine = create_engine('sqlite:///BENM.db')
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
-
+{:title="{{ site.data.lesson.handouts[1] }}" .no-eval .text-document}
 
 
 ===
@@ -184,30 +196,31 @@ For each document, we'll just store the "commentText" found in the API
 response.
 
 
+
 ~~~python
-doc = dkt['documents'].pop()
-doc['commentText']
+> doc = dkt['documents'].pop()
++ doc['commentText']
 ~~~
-{:.input title="Console"}
+{:title="Console" .input}
+
+
 ~~~
-'I am appalled that our treasured National monuments are up for review at all.  Every single one of our parks, monuments and cultural or historic sites is worthwhile and belongs as a part of the American story. I am adamantly opposed to any effort to eliminate or diminish protections for national monuments and I urge you to support our public lands and waters and recommend that our current national monuments remain protected. The short review you are undertaking makes a mockery of the decades of work that local communities have invested to protect these places for future generations, especially Bears Ears National monument, which is the first on the list for this review. Five Tribal nations, Hopi, Navajo, Uintah and Ouray Ute Indian Tribe, Ute Mountain Ute and Zuni tribes came together, for the first time ever, to protect their shared sacred land by advocating for Bears Ears to be made a national monument. Now the Bears Ears Inter-Tribal Coalition is working to protect the national monument, and maintain its integrity. Hear me, and the overwhelming number of people who agree with me: PUBLIC LANDS BELONG IN PUBLIC HANDS. It is your job as the Secretary of the Dept. of Interior to protect and safeguard our national treasures. Please make sure you side with the people who support national parks, monuments, historical and cultural sites. '
+"I am appalled that our treasured national parks and monuments, like the Bears Ears National Monument, are up for review at all. Bears Ears is one of our nation's newest monuments -- the American people are very lucky to now call this ancient site covering an expanse of 1.3 million acres a public resource protected for future generations. The monument protects ancient sites that are sacred to the Native American tribes in southern Utah's red-rock country. Utah is greatly enriched by the Bears Ears National Monument. Bears Ears National Monument also provides incredible spaces for outdoor activities-- it is one of best places in the world for rock climbing and bouldering. These public lands need to stay in public hands. No president has EVER attempted to abolish a national monument, and an attack on one park is an attack on all our parks. Secretary Zinke, I am adamantly opposed to any effort to eliminate or diminish protections for Bears Ears or any other national monument, and I urge you to support our public lands and waters and recommend that our current national monuments remain protected."
 ~~~
 {:.output}
-
 
 ===
 
 ### Step 3: Connect (and Initialize)
 
 
+
 ~~~python
-engine = create_engine('sqlite:///BENM.db')
-Session = sessionmaker(bind=engine)
-
-Base.metadata.create_all(engine)
+from schema import Session, Comment
+session = Session()
+engine = session.bind
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
-
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
 
 ===
@@ -221,11 +234,11 @@ Add a new `rpp` parameter to request `100` documents per page.
 
 
 
+
 ~~~python
 query['rpp'] = 10
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
-
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
 
 ===
@@ -235,9 +248,10 @@ record you want the response to begin with. Insert the documents (the
 key:value pairs stored in `values`) in bulk to the database with
 `engine.execute()`.
 
-===
+
 
 ~~~python
+table = Comment.metadata.tables['comment']
 for i in range(0, 15):
     query['po'] = i * query['rpp']
     print(query['po'])
@@ -245,30 +259,45 @@ for i in range(0, 15):
     page = response.json()
     docs = page['documents']
     values = [{'comment': doc['commentText']} for doc in docs]
-    insert = Comment.__table__.insert().values(values)
+    insert = table.insert().values(values)
     engine.execute(insert)
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
 
 ~~~
 0
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbc56518d0>
 10
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca08fd68>
 20
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbc55da080>
 30
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca09c4e0>
 40
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbc55e12e8>
 50
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca09ce48>
 60
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbc5651080>
 70
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca09cc50>
 80
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbc90f9f28>
 90
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbd1dc9a90>
 100
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca094d68>
 110
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca09c7f0>
 120
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca0a0668>
 130
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca0a4d30>
 140
+<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca0a4c88>
 ~~~
 {:.output}
-
 
 
 ===
@@ -277,11 +306,11 @@ View the records in the database by reading
 everyting we have so far back into a `DataFrame`.
 
 
+
 ~~~python
 df = pd.read_sql_table('comment', engine)
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
-
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
 
 ===
@@ -289,9 +318,9 @@ df = pd.read_sql_table('comment', engine)
 Don't forget to disconnect from your database!
 
 
+
 ~~~python
 engine.dispose()
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
-
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 

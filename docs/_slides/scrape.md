@@ -15,19 +15,20 @@ The [requests](){:.pylib} package provides a simple interface to
 issueing HTTP requests and handling the response.
 
 
+
 ~~~python
 import requests
 
 response = requests.get('https://xkcd.com/869')
 response
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
 
 ~~~
 <Response [200]>
 ~~~
 {:.output}
-
 
 
 ===
@@ -38,13 +39,15 @@ document. [BeautifulSoup](){:.pylib} does a fair job, while making no
 attempt to "render" a human readable page.
 
 
+
 ~~~python
 from bs4 import BeautifulSoup
 
 doc = BeautifulSoup(response.text, 'lxml')
 print('\n'.join(doc.prettify().splitlines()[0:10]))
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
 
 ~~~
 <!DOCTYPE html>
@@ -61,7 +64,6 @@ print('\n'.join(doc.prettify().splitlines()[0:10]))
 {:.output}
 
 
-
 ===
 
 Searching the document for desired content is the hard part. This search
@@ -69,17 +71,18 @@ uses a CSS query, to find the image below a section of the document with
 attribute `id = comic`.
 
 
+
 ~~~python
 img = doc.select('#comic > img').pop()
 img
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
 
 ~~~
 <img alt="Server Attention Span" src="//imgs.xkcd.com/comics/server_attention_span.png" title="They have to keep the adjacent rack units empty. Otherwise, half the entries in their /var/log/syslog are just 'SERVER BELOW TRYING TO START CONVERSATION *AGAIN*.' and 'WISH THEY'D STOP GIVING HIM SO MUCH COFFEE IT SPLATTERS EVERYWHERE.'"/>
 ~~~
 {:.output}
-
 
 
 ===
@@ -88,12 +91,14 @@ It makes sense to query by CSS if the content being scraped always appears
 the same in a browser; stylesheets are separate from delivered content.
 
 
+
 ~~~python
 from textwrap import fill
 
 print(fill(img['title'], width = 42))
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
 
 ~~~
 They have to keep the adjacent rack units
@@ -104,7 +109,6 @@ BELOW TRYING TO START CONVERSATION
 SO MUCH COFFEE IT SPLATTERS EVERYWHERE.'
 ~~~
 {:.output}
-
 
 
 ===
@@ -130,6 +134,7 @@ documentation for their data services in a massive such table:
 ===
 
 
+
 ~~~python
 import pandas as pd
 
@@ -139,21 +144,20 @@ acs5_variables = pd.read_html(
 vars = acs5_variables[0]
 vars.head()
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
 
 ~~~
-
-          Name                                              Label  ...     Group Values
-0       AIANHH                                   FIPS AIANHH code  ...       NaN    NaN
-1      AIHHTLI  American Indian Trust Land/Hawaiian Home Land ...  ...       NaN    NaN
-2       AITSCE          American Indian Tribal Subdivision (FIPS)  ...       NaN    NaN
-3         ANRC          Alaska Native Regional Corporation (FIPS)  ...       NaN    NaN
-4  B00001_001E                                    Estimate!!Total  ...    B00001    NaN
+          Name  ... Values
+0       AIANHH  ...    NaN
+1      AIHHTLI  ...    NaN
+2       AITSCE  ...    NaN
+3         ANRC  ...    NaN
+4  B00001_001E  ...    NaN
 
 [5 rows x 9 columns]
 ~~~
 {:.output}
-
 
 
 <!--
@@ -167,6 +171,7 @@ We can use our data manipulation tools to search this unwieldy
 documentation for variables of interest
 
 
+
 ~~~python
 rows = (
     vars['Label']
@@ -178,7 +183,9 @@ rows = (
 for idx, row in vars.loc[rows].iterrows():
     print('{}:\t{}'.format(row['Name'], row['Label']))
 ~~~
-{:.input title="Console"}
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
+
 ~~~
 B19013_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
 B19013A_001E:	Estimate!!Median household income in the past 12 months (in 2016 inflation-adjusted dollars)
@@ -268,5 +275,4 @@ B25120_004E:	Estimate!!Aggregate household income in the past 12 months (in 2016
 B25120_005E:	Estimate!!Aggregate household income in the past 12 months (in 2016 inflation-adjusted dollars)!!Renter occupied
 ~~~
 {:.output}
-
 

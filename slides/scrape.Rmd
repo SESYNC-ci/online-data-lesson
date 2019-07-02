@@ -41,7 +41,7 @@ Searching the document for desired content is the hard part. This search
 uses a CSS query, to find the image below a section of the document with
 attribute `id = comic`.
 
-```{python, handout = 1}
+```{python, handout = 0}
 img = doc.select('#comic > img').pop()
 img
 ```
@@ -99,7 +99,7 @@ failed_banks = pd.read_html(
 We can use our data manipulation tools to search this unwieldy
 documentation for variables of interest
 
-```{python}
+```{python, handout = 0}
 rows = (
     vars['Label']
     .str.contains(

@@ -16,7 +16,7 @@ exists: a dedicated package in your programming language's repository
 The [census](){:.pylib} package is a user contributed suite of tools
 that streamline access to the API.
 
-```{python title="{{ site.handouts }}"}
+```{python, handout = 0}
 from census import Census
 
 key = None
@@ -42,7 +42,7 @@ Compared to using the API directly via the [requests](){:.pylib} package:
 Query the Census ACS5 survey for the variable `B19001_001E` and each
 entity's `NAME`.
 
-```{python title="{{ site.handouts }}"}
+```{python, handout = 0}
 variables = ('NAME', 'B19013_001E')
 ```
 
@@ -51,7 +51,7 @@ variables = ('NAME', 'B19013_001E')
 The [census](){:.pylib} package converts the JSON string into a Python
 dictionary. (No need to check headers.)
 
-```{python title="{{ site.handouts }}"}
+```{python, handout = 0}
 response = c.acs5.state_county_tract(
     variables,
     '24',
@@ -66,7 +66,7 @@ response[0]
 The Pandas `DataFrame()` constructor will accept the list of
 dictionaries as the sole argument, taking column names from "keys".
 
-```{python title="{{ site.handouts }}"}
+```{python, handout = 0}
 df = pd.DataFrame(response)
 mask = df['B19013_001E'] == -666666666.0
 df = df.loc[~mask, :]
@@ -76,7 +76,7 @@ df = df.loc[~mask, :]
 
 The [seaborn](){:.pylib} package provides some nice, quick visualizations.
 
-```{python, include = False}
+```{python, handout = 0}
 import seaborn as sns
 
 sns.boxplot(

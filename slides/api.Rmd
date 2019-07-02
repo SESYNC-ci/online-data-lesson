@@ -8,16 +8,14 @@ data via their API at <https://api.census.gov>.
 
 ===
 
-The **I** in **API** is all the buttons and dials on the same kind of
-black box you need a **GUI** for (it's the same **I**).  Instead of
-interfacing with a user, those buttons and dials are meant for another
-software application.
+The **I** in **GUI** is for interface---its the same in **API**, where buttons and drop-down menus are replaced by functions and object attributes.
 
-In the case of the Census, the main component of the application is
-some relational database management system. There probabably are
-several **GUI**s designed for humans to query the Census database; the
-Census API is meant for communication between your program
-(i.e. script) and their application.
+Instead of interfacing with a user, this kind of interface is suitable for
+another software application. In the case of the Census, the main component of
+the application is some relational database management system. There probabably
+are several **GUI**s designed for humans to query the Census database; the
+Census API is meant for communication between your program (i.e. script) and
+their application.
 {:.notes}
 
 ===
@@ -32,25 +30,25 @@ the URL in a standards compliant way that the service will accept.
 
 ===
 
-| Section           | Description                                                             |
-|-------------------+-------------------------------------------------------------------------|
-| `https://`        | **scheme**                                                              |
-| `api.census.gov`  | **authority**, or simply host if there's no user authentication         |
-| `/data/2015/acs5` | **path** to a resource within a hierarchy                               |
-|-------------------+-------------------------------------------------------------------------|
-| `?`               | beginning of the **query** component of a URL                           |
-| `get=NAME`        | first query parameter                                                   |
-| `&`               | query parameter separator                                               |
-| `for=county`      | second query parameter                                                  |
-| `&`               | query parameter separator                                               |
-| `in=state:*`      | third query parameter                                                   |
-|-------------------+-------------------------------------------------------------------------|
-| `#`               | beginning of the **fragment** component of a URL                        |
-| `irrelevant`      | the fragment is a client side pointer, it isn't even sent to the server |
+| Section | Description |  
+|---+---|
+| `https://`        | **scheme** |
+| `api.census.gov`  | **authority**, or simply host if there's no user authentication |
+| `/data/2015/acs5` | **path** to a resource within a hierarchy |
+|---+---|
+| `?`          | beginning of the **query** component of a URL |
+| `get=NAME`   | first query parameter |
+| `&`          | query parameter separator |
+| `for=county` | second query parameter |
+| `&`          | query parameter separator |
+| `in=state:*` | third query parameter |
+|---+---|
+| `#`          | beginning of the **fragment** component of a URL |
+| `irrelevant` | a document section, it isn't even sent to the server |
 
 ===
 
-```{python title="{{ site.data.lesson.handouts[0] }}"}
+```{python, handout = 0}
 path = 'https://api.census.gov/data/2016/acs/acs5'
 query = {
   'get':'NAME,B19013_001E',
@@ -83,7 +81,7 @@ Most REST APIs return as the "content" either:
 
 The header from Census says the content type is JSON.
 
-```{python title="{{ site.data.lesson.handouts[0] }}"}
+```{python, handout = 0}
 for k, v in response.headers.items():
     print('{}: {}'.format(k, v))
 ```
@@ -95,7 +93,7 @@ for k, v in response.headers.items():
 Use a JSON reader to extract a Python object. To read it into
 a Panda's `DataFrame`, use Panda's `read_json`.
 
-```{python title="{{ site.data.lesson.handouts[0] }}"}
+```{python, handout = 0}
 data = pd.read_json(response.content)
 data.head()
 ```

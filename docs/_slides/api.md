@@ -8,16 +8,14 @@ data via their API at <https://api.census.gov>.
 
 ===
 
-The **I** in **API** is all the buttons and dials on the same kind of
-black box you need a **GUI** for (it's the same **I**).  Instead of
-interfacing with a user, those buttons and dials are meant for another
-software application.
+The **I** in **GUI** is for interface---its the same in **API**, where buttons and drop-down menus are replaced by functions and object attributes.
 
-In the case of the Census, the main component of the application is
-some relational database management system. There probabably are
-several **GUI**s designed for humans to query the Census database; the
-Census API is meant for communication between your program
-(i.e. script) and their application.
+Instead of interfacing with a user, this kind of interface is suitable for
+another software application. In the case of the Census, the main component of
+the application is some relational database management system. There probabably
+are several **GUI**s designed for humans to query the Census database; the
+Census API is meant for communication between your program (i.e. script) and
+their application.
 {:.notes}
 
 ===
@@ -32,23 +30,24 @@ the URL in a standards compliant way that the service will accept.
 
 ===
 
-| Section           | Description                                                             |
-|-------------------+-------------------------------------------------------------------------|
-| `https://`        | **scheme**                                                              |
-| `api.census.gov`  | **authority**, or simply host if there's no user authentication         |
-| `/data/2015/acs5` | **path** to a resource within a hierarchy                               |
-|-------------------+-------------------------------------------------------------------------|
-| `?`               | beginning of the **query** component of a URL                           |
-| `get=NAME`        | first query parameter                                                   |
-| `&`               | query parameter separator                                               |
-| `for=county`      | second query parameter                                                  |
-| `&`               | query parameter separator                                               |
-| `in=state:*`      | third query parameter                                                   |
-|-------------------+-------------------------------------------------------------------------|
-| `#`               | beginning of the **fragment** component of a URL                        |
-| `irrelevant`      | the fragment is a client side pointer, it isn't even sent to the server |
+| Section | Description |  
+|---+---|
+| `https://`        | **scheme** |
+| `api.census.gov`  | **authority**, or simply host if there's no user authentication |
+| `/data/2015/acs5` | **path** to a resource within a hierarchy |
+|---+---|
+| `?`          | beginning of the **query** component of a URL |
+| `get=NAME`   | first query parameter |
+| `&`          | query parameter separator |
+| `for=county` | second query parameter |
+| `&`          | query parameter separator |
+| `in=state:*` | third query parameter |
+|---+---|
+| `#`          | beginning of the **fragment** component of a URL |
+| `irrelevant` | a document section, it isn't even sent to the server |
 
 ===
+
 
 
 ~~~python
@@ -61,13 +60,13 @@ query = {
 response = requests.get(path, params=query)
 response
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
 
 ~~~
 <Response [200]>
 ~~~
 {:.output}
-
 
 
 ===
@@ -93,11 +92,13 @@ Most REST APIs return as the "content" either:
 The header from Census says the content type is JSON.
 
 
+
 ~~~python
 for k, v in response.headers.items():
     print('{}: {}'.format(k, v))
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
 
 ~~~
 Server: Apache-Coyote/1.1
@@ -107,11 +108,10 @@ Access-Control-Allow-Methods: GET,POST
 Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
 Content-Type: application/json;charset=utf-8
 Transfer-Encoding: chunked
-Date: Thu, 26 Jul 2018 11:09:26 GMT
+Date: Tue, 02 Jul 2019 21:03:04 GMT
 Strict-Transport-Security: max-age=31536000
 ~~~
 {:.output}
-
 
 
 ===
@@ -122,23 +122,25 @@ Use a JSON reader to extract a Python object. To read it into
 a Panda's `DataFrame`, use Panda's `read_json`.
 
 
+
 ~~~python
 data = pd.read_json(response.content)
 data.head()
 ~~~
-{:.text-document title="{{ site.handouts[0] }}"}
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
 
 ~~~
+                                           0            1  ...       3       4
+0                                       NAME  B19013_001E  ...  county   tract
+1  Census Tract 1, Allegany County, Maryland        42292  ...     001  000100
+2  Census Tract 2, Allegany County, Maryland        44125  ...     001  000200
+3  Census Tract 3, Allegany County, Maryland        39571  ...     001  000300
+4  Census Tract 4, Allegany County, Maryland        39383  ...     001  000400
 
-                                           0            1      2       3       4
-0                                       NAME  B19013_001E  state  county   tract
-1  Census Tract 1, Allegany County, Maryland        42292     24     001  000100
-2  Census Tract 2, Allegany County, Maryland        44125     24     001  000200
-3  Census Tract 3, Allegany County, Maryland        39571     24     001  000300
-4  Census Tract 4, Allegany County, Maryland        39383     24     001  000400
+[5 rows x 5 columns]
 ~~~
 {:.output}
-
 
 
 ===
