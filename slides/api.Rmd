@@ -1,31 +1,32 @@
 ---
 ---
 
-## REST API
+## Web Services
 
 The US Census Burea provides access to its vast stores of demographic
-data via their API at <https://api.census.gov>.
+data over the Web via their API at <https://api.census.gov>.
 
 ===
 
-The **I** in **GUI** is for interface---its the same in **API**, where buttons and drop-down menus are replaced by functions and object attributes.
+The **I** in **GUI** is for interface---its the same in **API**, where buttons
+and drop-down menus are replaced by functions and object attributes.
 
-Instead of interfacing with a user, this kind of interface is suitable for
-another software application. In the case of the Census, the main component of
-the application is some relational database management system. There probabably
-are several **GUI**s designed for humans to query the Census database; the
-Census API is meant for communication between your program (i.e. script) and
-their application.
+Instead of interfacing with a user, this kind of **i**nterface is suitable for
+use in **p**rogramming another software **a**pplication. In the case of the
+Census, the main component of the application is some relational database
+management system. There probabably are several GUIs designed for humans to
+query the Census database; the Census API is meant for communication between
+your program (i.e. script) and their application.
 {:.notes}
 
 ===
 
 Inspect [this URL](https://api.census.gov/data/2015/acs5?get=NAME&for=county&in=state:24#irrelephant){:target="_blank"} in your browser.
 
-In a RESTful web service, the already universal system for
+In a web service, the already universal system for
 transferring data over the internet, known as HTTP is half of the
 interface. All you really need is documentation for how to construct
-the URL in a standards compliant way that the service will accept.
+the URL in a standards compliant way that the service will recognize.
 {:.notes}
 
 ===
@@ -33,7 +34,7 @@ the URL in a standards compliant way that the service will accept.
 | Section | Description |  
 |---+---|
 | `https://`        | **scheme** |
-| `api.census.gov`  | **authority**, or simply host if there's no user authentication |
+| `api.census.gov`  | **authority**, or simply domain if there's no user authentication |
 | `/data/2015/acs5` | **path** to a resource within a hierarchy |
 |---+---|
 | `?`          | beginning of the **query** component of a URL |
@@ -49,11 +50,11 @@ the URL in a standards compliant way that the service will accept.
 ===
 
 ```{python, handout = 0}
-path = 'https://api.census.gov/data/2016/acs/acs5'
+path = 'https://api.census.gov/data/2017/acs/acs5'
 query = {
-  'get':'NAME,B19013_001E',
-  'for':'tract:*',
-  'in':'state:24',
+  'get': 'NAME,B19013_001E',
+  'for': 'tract:*',
+  'in': 'state:24',
 }
 response = requests.get(path, params=query)
 response
@@ -82,8 +83,7 @@ Most REST APIs return as the "content" either:
 The header from Census says the content type is JSON.
 
 ```{python, handout = 0}
-for k, v in response.headers.items():
-    print('{}: {}'.format(k, v))
+response.headers['Content-Type']
 ```
 
 ===

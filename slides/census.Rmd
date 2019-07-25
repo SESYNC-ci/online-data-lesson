@@ -54,9 +54,9 @@ dictionary. (No need to check headers.)
 ```{python, handout = 0}
 response = c.acs5.state_county_tract(
     variables,
-    '24',
-    Census.ALL,
-    Census.ALL
+    state_fips=...,
+    county_fips=...,
+    tract=Census.ALL,
     )
 response[0]
 ```
@@ -67,9 +67,10 @@ The Pandas `DataFrame()` constructor will accept the list of
 dictionaries as the sole argument, taking column names from "keys".
 
 ```{python, handout = 0}
-df = pd.DataFrame(response)
-mask = df['B19013_001E'] == -666666666.0
-df = df.loc[~mask, :]
+df = (pd
+  .DataFrame(response)
+  .loc[df['B19013_001E']!=df['B19013_001E'].min(), :]
+  )
 ```
 
 ===

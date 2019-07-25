@@ -1,7 +1,7 @@
 ---
 ---
 
-## Response Stashing
+## Paging & Stashing
 
 A common strategy that web service providers take to balance their
 load, is to limit the number of records a single API request can
@@ -37,10 +37,12 @@ path = 'document.json'
 query = {
     'documentId':'DOI-2017-0002-0001',
     'api_key':API_KEY,
-    }
-response = requests.get(
-    api + path,
-    params=query)
+}
+doc = (
+    requests
+    .get(api + path, params=query)
+    .json()
+)
 ```
 
 ===
@@ -48,12 +50,8 @@ response = requests.get(
 Extract data from the returned JSON object, which gets mapped to a
 Python dictionary called `doc`.
 
-```{python, handout = 0}
-doc = response.json()
-print('{}: {}'.format(
-    doc['numItemsRecieved']['label'],
-    doc['numItemsRecieved']['value'],
-))
+```{python}
+doc['numItemsRecieved']
 ```
 
 ===
@@ -63,14 +61,16 @@ the dictionary keys in the response.
 
 ```{python, handout = 0}
 query = {
-    'dktid': doc['docketId']['value'],
-    'dct': 'PS',
-    'api_key': API_KEY,
-    }
+    'dktid':doc['docketId']['value'],
+    'dct':'PS',
+    'api_key':API_KEY,
+}
 path = 'documents.json'
-response = requests.get(
-    api + path, params=query)
-dkt = response.json()
+dkt = (
+     requests
+    .get(api + path, params=query)
+    .json()
+)
 ```
 
 To inspect the return, we can list the keys in the
@@ -85,13 +85,8 @@ list(dkt.keys())
 The purported claimed number of results is much larger than the length
 of the documents array contained in this response.
 
-
-```{python, handout = 0}
-print('Number received: {}\nTotal number: {}'
-    .format(
-        len(dkt['documents']),
-        dkt['totalNumRecords'],
-))
+```{python}
+len(dkt['documents'])
 ```
 
 ===
@@ -158,6 +153,7 @@ doc['commentText']
 
 ```{python, handout = 0}
 from schema import Session, Comment
+
 session = Session()
 engine = session.bind
 ```
@@ -186,11 +182,14 @@ key:value pairs stored in `values`) in bulk to the database with
 ```{python, handout = 0}
 table = Comment.metadata.tables['comment']
 for i in range(0, 15):
-    query['po'] = i * query['rpp']
-    print(query['po'])
+    
+    # advance page and query
+    query['po'] = ...
     response = requests.get(api + path, params=query)
     page = response.json()
     docs = page['documents']
+    
+    # save page with session engine
     values = [{'comment': doc['commentText']} for doc in docs]
     insert = table.insert().values(values)
     engine.execute(insert)
