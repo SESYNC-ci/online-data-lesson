@@ -1,31 +1,32 @@
 ---
 ---
 
-## REST API
+## Web Services
 
 The US Census Burea provides access to its vast stores of demographic
-data via their API at <https://api.census.gov>.
+data over the Web via their API at <https://api.census.gov>.
 
 ===
 
-The **I** in **GUI** is for interface---its the same in **API**, where buttons and drop-down menus are replaced by functions and object attributes.
+The **I** in **GUI** is for interface---its the same in **API**, where buttons
+and drop-down menus are replaced by functions and object attributes.
 
-Instead of interfacing with a user, this kind of interface is suitable for
-another software application. In the case of the Census, the main component of
-the application is some relational database management system. There probabably
-are several **GUI**s designed for humans to query the Census database; the
-Census API is meant for communication between your program (i.e. script) and
-their application.
+Instead of interfacing with a user, this kind of **i**nterface is suitable for
+use in **p**rogramming another software **a**pplication. In the case of the
+Census, the main component of the application is some relational database
+management system. There probabably are several GUIs designed for humans to
+query the Census database; the Census API is meant for communication between
+your program (i.e. script) and their application.
 {:.notes}
 
 ===
 
 Inspect [this URL](https://api.census.gov/data/2015/acs5?get=NAME&for=county&in=state:24#irrelephant){:target="_blank"} in your browser.
 
-In a RESTful web service, the already universal system for
+In a web service, the already universal system for
 transferring data over the internet, known as HTTP is half of the
 interface. All you really need is documentation for how to construct
-the URL in a standards compliant way that the service will accept.
+the URL in a standards compliant way that the service will recognize.
 {:.notes}
 
 ===
@@ -33,7 +34,7 @@ the URL in a standards compliant way that the service will accept.
 | Section | Description |  
 |---+---|
 | `https://`        | **scheme** |
-| `api.census.gov`  | **authority**, or simply host if there's no user authentication |
+| `api.census.gov`  | **authority**, or simply domain if there's no user authentication |
 | `/data/2015/acs5` | **path** to a resource within a hierarchy |
 |---+---|
 | `?`          | beginning of the **query** component of a URL |
@@ -51,11 +52,11 @@ the URL in a standards compliant way that the service will accept.
 
 
 ~~~python
-path = 'https://api.census.gov/data/2016/acs/acs5'
+path = 'https://api.census.gov/data/2017/acs/acs5'
 query = {
-  'get':'NAME,B19013_001E',
-  'for':'tract:*',
-  'in':'state:24',
+  'get': 'NAME,B19013_001E',
+  'for': 'tract:*',
+  'in': 'state:24',
 }
 response = requests.get(path, params=query)
 response
@@ -94,22 +95,13 @@ The header from Census says the content type is JSON.
 
 
 ~~~python
-for k, v in response.headers.items():
-    print('{}: {}'.format(k, v))
+response.headers['Content-Type']
 ~~~
 {:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
 
 ~~~
-Server: Apache-Coyote/1.1
-Cache-Control: max-age=60, must-revalidate
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET,POST
-Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
-Content-Type: application/json;charset=utf-8
-Transfer-Encoding: chunked
-Date: Tue, 02 Jul 2019 21:03:04 GMT
-Strict-Transport-Security: max-age=31536000
+'application/json;charset=utf-8'
 ~~~
 {:.output}
 
@@ -131,12 +123,12 @@ data.head()
 
 
 ~~~
-                                           0            1  ...       3       4
-0                                       NAME  B19013_001E  ...  county   tract
-1  Census Tract 1, Allegany County, Maryland        42292  ...     001  000100
-2  Census Tract 2, Allegany County, Maryland        44125  ...     001  000200
-3  Census Tract 3, Allegany County, Maryland        39571  ...     001  000300
-4  Census Tract 4, Allegany County, Maryland        39383  ...     001  000400
+                                                0            1  ...       3       4
+0                                            NAME  B19013_001E  ...  county   tract
+1  Census Tract 105.01, Wicomico County, Maryland        68652  ...     045  010501
+2  Census Tract 5010.02, Carroll County, Maryland        75069  ...     013  501002
+3  Census Tract 5077.04, Carroll County, Maryland        88306  ...     013  507704
+4  Census Tract 5061.02, Carroll County, Maryland        84810  ...     013  506102
 
 [5 rows x 5 columns]
 ~~~

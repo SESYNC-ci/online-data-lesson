@@ -184,7 +184,7 @@ table = Comment.metadata.tables['comment']
 for i in range(0, 15):
     
     # advance page and query
-    query['po'] = ...
+    query['po'] = i * query['rpp']
     response = requests.get(api + path, params=query)
     page = response.json()
     docs = page['documents']

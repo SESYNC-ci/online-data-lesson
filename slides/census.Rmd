@@ -20,7 +20,7 @@ that streamline access to the API.
 from census import Census
 
 key = None
-c = Census(key, year=2016)
+c = Census(key, year=2017)
 c.acs5
 ```
 
@@ -54,10 +54,10 @@ dictionary. (No need to check headers.)
 ```{python, handout = 0}
 response = c.acs5.state_county_tract(
     variables,
-    state_fips=...,
-    county_fips=...,
+    state_fips='24',
+    county_fips=Census.ALL,
     tract=Census.ALL,
-    )
+)
 response[0]
 ```
 
@@ -67,17 +67,18 @@ The Pandas `DataFrame()` constructor will accept the list of
 dictionaries as the sole argument, taking column names from "keys".
 
 ```{python, handout = 0}
-df = (pd
+df = (
+  pd
   .DataFrame(response)
-  .loc[df['B19013_001E']!=df['B19013_001E'].min(), :]
-  )
+  .query("B19013_001E >= 0")
+)
 ```
 
 ===
 
 The [seaborn](){:.pylib} package provides some nice, quick visualizations.
 
-```{python, handout = 0}
+```{python, handout = 0, eval = FALSE}
 import seaborn as sns
 
 sns.boxplot(

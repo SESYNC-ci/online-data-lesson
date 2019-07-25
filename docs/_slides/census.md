@@ -22,14 +22,14 @@ that streamline access to the API.
 from census import Census
 
 key = None
-c = Census(key, year=2016)
+c = Census(key, year=2017)
 c.acs5
 ~~~
 {:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
 
 ~~~
-<census.core.ACS5Client object at 0x7fcbfec612e8>
+<census.core.ACS5Client object at 0x128c91ad0>
 ~~~
 {:.output}
 
@@ -70,17 +70,17 @@ dictionary. (No need to check headers.)
 ~~~python
 response = c.acs5.state_county_tract(
     variables,
-    '24',
-    Census.ALL,
-    Census.ALL
-    )
+    state_fips='24',
+    county_fips=Census.ALL,
+    tract=Census.ALL,
+)
 response[0]
 ~~~
 {:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
 
 ~~~
-{'state': '24', 'NAME': 'Census Tract 1, Allegany County, Maryland', 'tract': '000100', 'county': '001', 'B19013_001E': 42292.0}
+{'NAME': 'Census Tract 105.01, Wicomico County, Maryland', 'B19013_001E': 68652.0, 'state': '24', 'county': '045', 'tract': '010501'}
 ~~~
 {:.output}
 
@@ -93,9 +93,11 @@ dictionaries as the sole argument, taking column names from "keys".
 
 
 ~~~python
-df = pd.DataFrame(response)
-mask = df['B19013_001E'] == -666666666.0
-df = df.loc[~mask, :]
+df = (
+  pd
+  .DataFrame(response)
+  .query("B19013_001E >= 0")
+)
 ~~~
 {:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
@@ -115,6 +117,5 @@ sns.boxplot(
   y = 'B19013_001E',
 )
 ~~~
-{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
-![ ]({% include asset.html path="images/census/unnamed-chunk-5-1.png" %})
-{:.captioned}
+{:title="{{ site.data.lesson.handouts[0] }}" .no-eval .text-document}
+

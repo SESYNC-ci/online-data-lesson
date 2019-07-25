@@ -1,7 +1,7 @@
 ---
 ---
 
-## Response Stashing
+## Paging & Stashing
 
 A common strategy that web service providers take to balance their
 load, is to limit the number of records a single API request can
@@ -39,10 +39,12 @@ path = 'document.json'
 query = {
     'documentId':'DOI-2017-0002-0001',
     'api_key':API_KEY,
-    }
-response = requests.get(
-    api + path,
-    params=query)
+}
+doc = (
+    requests
+    .get(api + path, params=query)
+    .json()
+)
 ~~~
 {:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
@@ -55,17 +57,13 @@ Python dictionary called `doc`.
 
 
 ~~~python
-doc = response.json()
-print('{}: {}'.format(
-    doc['numItemsRecieved']['label'],
-    doc['numItemsRecieved']['value'],
-))
+> doc['numItemsRecieved']
 ~~~
-{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+{:title="Console" .input}
 
 
 ~~~
-Number of Comments Received: 2839046
+{'label': 'Number of Comments Received', 'value': '2839046'}
 ~~~
 {:.output}
 
@@ -79,14 +77,16 @@ the dictionary keys in the response.
 
 ~~~python
 query = {
-    'dktid': doc['docketId']['value'],
-    'dct': 'PS',
-    'api_key': API_KEY,
-    }
+    'dktid':doc['docketId']['value'],
+    'dct':'PS',
+    'api_key':API_KEY,
+}
 path = 'documents.json'
-response = requests.get(
-    api + path, params=query)
-dkt = response.json()
+dkt = (
+     requests
+    .get(api + path, params=query)
+    .json()
+)
 ~~~
 {:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
@@ -103,7 +103,7 @@ parsed `dkt`.
 
 
 ~~~
-['totalNumRecords', 'documents']
+['documents', 'totalNumRecords']
 ~~~
 {:.output}
 
@@ -115,20 +115,14 @@ of the documents array contained in this response.
 
 
 
-
 ~~~python
-print('Number received: {}\nTotal number: {}'
-    .format(
-        len(dkt['documents']),
-        dkt['totalNumRecords'],
-))
+> len(dkt['documents'])
 ~~~
-{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+{:title="Console" .input}
 
 
 ~~~
-Number received: 25
-Total number: 783340
+25
 ~~~
 {:.output}
 
@@ -205,7 +199,7 @@ response.
 
 
 ~~~
-"I am appalled that our treasured national parks and monuments, like the Bears Ears National Monument, are up for review at all. Bears Ears is one of our nation's newest monuments -- the American people are very lucky to now call this ancient site covering an expanse of 1.3 million acres a public resource protected for future generations. The monument protects ancient sites that are sacred to the Native American tribes in southern Utah's red-rock country. Utah is greatly enriched by the Bears Ears National Monument. Bears Ears National Monument also provides incredible spaces for outdoor activities-- it is one of best places in the world for rock climbing and bouldering. These public lands need to stay in public hands. No president has EVER attempted to abolish a national monument, and an attack on one park is an attack on all our parks. Secretary Zinke, I am adamantly opposed to any effort to eliminate or diminish protections for Bears Ears or any other national monument, and I urge you to support our public lands and waters and recommend that our current national monuments remain protected."
+"Dear Ryan Zinke,\n\nOur national monuments and public lands and waters help define who we are as a nation by telling the story of our shared historical, cultural, and natural heritage. I am concerned that the recent Executive Order attempts to undermine our national monuments and to roll back protections of these public lands. Protected public lands are an important part of what makes America great. I strongly urge you to oppose any efforts to eliminate or shrink our national monuments.\n\nSince President Theodore Roosevelt signed the Antiquities Act into law in 1906, 16 Presidents - 8 Republicans and 8 Democrats - have used the authority granted by the act to safeguard public lands, oceans, and historic sites in order to share America's story with future generations. These national monument designations are broadly supported from coast to coast and provide a myriad of benefits to local communities, including economic boosts from tourism, places to enjoy the outdoors, clean air and water, protection for ecologically sensitive areas, and windows into our country's history.\n\nSending a signal that protections for our shared history, culture, and natural treasures are temporary would set a terrible precedent. National monuments have been shown to be tremendous drivers of the $887 billion outdoor recreation economy and businesses rely on the permanency of these protections when making decisions about investing in these communities.\n\nFrom Maine's magnificent Katahdin Woods to the colorful canyons of Utah's Grand Staircase-Escalante to the western history held in New Mexico's Organ Mountains-Desert Peaks, these landmarks, landscapes, and seascapes have value which far exceeds their physical features; they manifest the core democratic ideals of freedom, justice, and equality. They are our legacy to our children and our children's children, and a gift that belongs to all Americans.\n\nI am firmly opposed to any effort to revoke or diminish protections for our national monuments. I urge you to support our public lands and waters and recommend that our current national monuments remain as they are today.\n\nSincerely,\nNic Brooksher\n  Baton Rouge, LA 70808"
 ~~~
 {:.output}
 
@@ -217,6 +211,7 @@ response.
 
 ~~~python
 from schema import Session, Comment
+
 session = Session()
 engine = session.bind
 ~~~
@@ -253,11 +248,14 @@ key:value pairs stored in `values`) in bulk to the database with
 ~~~python
 table = Comment.metadata.tables['comment']
 for i in range(0, 15):
+    
+    # advance page and query
     query['po'] = i * query['rpp']
-    print(query['po'])
     response = requests.get(api + path, params=query)
     page = response.json()
     docs = page['documents']
+    
+    # save page with session engine
     values = [{'comment': doc['commentText']} for doc in docs]
     insert = table.insert().values(values)
     engine.execute(insert)
@@ -266,36 +264,21 @@ for i in range(0, 15):
 
 
 ~~~
-0
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbc56518d0>
-10
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca08fd68>
-20
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbc55da080>
-30
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca09c4e0>
-40
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbc55e12e8>
-50
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca09ce48>
-60
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbc5651080>
-70
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca09cc50>
-80
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbc90f9f28>
-90
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbd1dc9a90>
-100
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca094d68>
-110
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca09c7f0>
-120
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca0a0668>
-130
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca0a4d30>
-140
-<sqlalchemy.engine.result.ResultProxy object at 0x7fcbca0a4c88>
+<sqlalchemy.engine.result.ResultProxy object at 0x128383250>
+<sqlalchemy.engine.result.ResultProxy object at 0x12837a790>
+<sqlalchemy.engine.result.ResultProxy object at 0x12837ced0>
+<sqlalchemy.engine.result.ResultProxy object at 0x12838b110>
+<sqlalchemy.engine.result.ResultProxy object at 0x128386c50>
+<sqlalchemy.engine.result.ResultProxy object at 0x128386b10>
+<sqlalchemy.engine.result.ResultProxy object at 0x12838b290>
+<sqlalchemy.engine.result.ResultProxy object at 0x12837a850>
+<sqlalchemy.engine.result.ResultProxy object at 0x128386190>
+<sqlalchemy.engine.result.ResultProxy object at 0x128390750>
+<sqlalchemy.engine.result.ResultProxy object at 0x128396610>
+<sqlalchemy.engine.result.ResultProxy object at 0x128394bd0>
+<sqlalchemy.engine.result.ResultProxy object at 0x1265cef50>
+<sqlalchemy.engine.result.ResultProxy object at 0x12837a290>
+<sqlalchemy.engine.result.ResultProxy object at 0x12838f590>
 ~~~
 {:.output}
 
