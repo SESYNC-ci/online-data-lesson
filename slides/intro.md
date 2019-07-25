@@ -3,9 +3,9 @@
 
 ## Lesson Objectives
 
-- Distinguish three sources for online data
-- Understand how HTTP and web-services work
-- Learn Python idioms for requesting data
+- Distinguish three types of online data
+- Breakdown how web services use HTTP
+- Learn Python tools for data aquisition
 
 ===
 
@@ -14,6 +14,7 @@
 - Programatically aquire data embedded in a web page
 - Request data through a REST API
 - Use the [census](){:.pylib} package to aquire data
+- Use SQLite for caching
 
 ===
 

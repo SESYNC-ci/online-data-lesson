@@ -81,10 +81,11 @@ documentation for their data services in a massive such table:
 ```{python, handout = 0}
 import pandas as pd
 
-acs5_vars = (pd
+vars = (
+  pd
   .read_html('https://api.census.gov/data/2017/acs/acs5/variables.html')
   .pop()
-  )
+)
 vars.head()
 ```
 
@@ -94,9 +95,10 @@ We can use our data manipulation tools to search this unwieldy
 documentation for variables of interest
 
 ```{python, handout = 0}
-idx = (vars['Label']
-    .str
-    .contains('Median household income')
-    )
+idx = (
+  vars['Label']
+  .str
+  .contains('Median household income')
+)
 vars.loc[idx, ['Name', 'Label']]
 ```
