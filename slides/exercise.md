@@ -12,7 +12,10 @@ the data for this variable, for every county in the U.S. state with FIPS code
 
 ### Exercise 2
 
-Get an API key for Regulations.gov, and collect 3 "pages" of comments posted on
-the "Revised Definition of 'Waters of the United States'". Over half a million
-were received before the comment period closed on April 15^th^, 2019. Modify
-`schema.py` to save the comments into a new SQLite file.
+Request an [API key for Regulations.gov] or find one you have permission to
+access. Use the API to collect 3 "pages" of comments posted on the "Revised
+Definition of 'Waters of the United States'". Over half a million were received
+before the comment period closed on April 15^th^, 2019. Modify `schema.py` to
+save the comments into a new SQLite file.
+
+[API key for Regulations.gov]: https://regulationsgov.github.io/developers/
