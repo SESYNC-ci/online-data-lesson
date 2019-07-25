@@ -14,4 +14,5 @@ sorter:
   - api
   - census
   - rdbms
-  - conclude  
+  - conclude
+  - exercise
