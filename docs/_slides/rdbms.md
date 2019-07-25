@@ -28,11 +28,19 @@ accessible through [Regulations.gov](https://www.regulations.gov).
 
 ===
 
+Load the `API_KEY` variable by running a file you have saved it in.
+
+~~~python
+%run path/to/api/key.py
+~~~
+{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+
+===
+
 
 
 ~~~python
 import requests
-from api_key import API_KEY
 
 api = 'https://api.data.gov/regulations/v3/'
 path = 'document.json'
