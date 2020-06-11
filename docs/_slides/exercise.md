@@ -3,6 +3,10 @@
 
 ## Exercises
 
+### Note
+
+*These exercises may no longer work because [regulations.gov is unfortunately no longer issuing new API keys](https://sunlightfoundation.com/2018/03/09/in-the-wake-of-fraudulent-comments-regulations-gov-revises-api-policy/). We will replace them with new ones shortly.*
+
 ### Exercise 1
 
 Identify the name of the census variable in the table of ACS variables whose
