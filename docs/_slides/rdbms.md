@@ -20,20 +20,22 @@ file with the single variable `API_KEY = your many digit key`.
 
 ===
 
-The "data.gov" API provides a case in point. Take a look at the
-[request for comments](https://www.regulations.gov/docket?D=DOI-2017-0002)
-posted by the US Department of Interior about Bears Ear National
-Monument. The document received over two million comments, all
-accessible through [Regulations.gov](https://www.regulations.gov).
+The "data.gov" API provides a case in point. **more info re api** 
+The U.S. Department of Agriculture maintains a data system of nutrition information 
+for thousands of foods at [FoodData Central](https://fdc.nal.usda.gov/). We might
+be interested in the relative nutrient content of different fruits.
 
 ===
 
 Load the `API_KEY` variable by running a file you have saved it in.
 
+
+
 ~~~python
-%run path/to/api/key.py
+> exec(open("api_key.py").read())
 ~~~
-{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+{:title="Console" .input}
+
 
 ===
 
@@ -42,13 +44,13 @@ Load the `API_KEY` variable by running a file you have saved it in.
 ~~~python
 import requests
 
-api = 'https://api.data.gov/regulations/v3/'
-path = 'document.json'
+api = 'https://api.nal.usda.gov/fdc/v1/'
+path = 'foods/search'
 query = {
-    'documentId':'DOI-2017-0002-0001',
     'api_key':API_KEY,
+    'query':'fruit',
 }
-doc = (
+fruits = (
     requests
     .get(api + path, params=query)
     .json()
@@ -60,58 +62,38 @@ doc = (
 ===
 
 Extract data from the returned JSON object, which gets mapped to a
-Python dictionary called `doc`.
+Python dictionary called `doc`. To inspect the return, we can list 
+the dictionary keys.
 
 
 
 ~~~python
-> doc['numItemsRecieved']
+> list(fruits.keys())
 ~~~
 {:title="Console" .input}
 
 
 ~~~
-{'label': 'Number of Comments Received', 'value': '2839046'}
+['foods', 'foodSearchCriteria', 'totalHits', 'currentPage', 'totalPages']
 ~~~
 {:.output}
 
 
 ===
 
-Initiate a new API query for public submission (PS) comments and print
-the dictionary keys in the response.
+We can print the value associated with the key `totalHits` to see
+how many foods matched our search term, `"fruit"`.
 
 
 
 ~~~python
-query = {
-    'dktid':doc['docketId']['value'],
-    'dct':'PS',
-    'api_key':API_KEY,
-}
-path = 'documents.json'
-dkt = (
-     requests
-    .get(api + path, params=query)
-    .json()
-)
-~~~
-{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
-
-
-To inspect the return, we can list the keys in the
-parsed `dkt`.
-
-
-
-~~~python
-> list(dkt.keys())
+> fruits['totalHits']
 ~~~
 {:title="Console" .input}
 
 
 ~~~
-['documents', 'totalNumRecords']
+17833
 ~~~
 {:.output}
 
@@ -119,18 +101,18 @@ parsed `dkt`.
 ===
 
 The purported claimed number of results is much larger than the length
-of the documents array contained in this response.
+of the `foods` array contained in this response.
 
 
 
 ~~~python
-> len(dkt['documents'])
+> len(fruits['foods'])
 ~~~
 {:title="Console" .input}
 
 
 ~~~
-25
+50
 ~~~
 {:.output}
 
@@ -175,17 +157,18 @@ will map to columns in a table.
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Column, Integer, Text, Numeric
 
 Base = declarative_base()
 
-class Comment(Base):
-    __tablename__ = 'comment'
+class Food(Base):
+    __tablename__ = 'food'
     
     id = Column(Integer, primary_key=True)
-    comment = Column(Text)
+    name = Column(Text)
+    sugar = Column(Numeric)
     
-engine = create_engine('sqlite:///BENM.db')
+engine = create_engine('sqlite:///fruits.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 ~~~
@@ -194,20 +177,36 @@ Session = sessionmaker(bind=engine)
 
 ===
 
-For each document, we'll just store the "commentText" found in the API
-response.
+For each fruit, we'll store its name and the amount of sugar
+(grams of sugar per 100 grams of fruit) found in the API response.
 
 
 
 ~~~python
-> doc = dkt['documents'].pop()
-+ doc['commentText']
+> fruit = fruits['foods'].pop()
++ fruit['description']
 ~~~
 {:title="Console" .input}
 
 
 ~~~
-"Dear Ryan Zinke,\n\nOur national monuments and public lands and waters help define who we are as a nation by telling the story of our shared historical, cultural, and natural heritage. I am concerned that the recent Executive Order attempts to undermine our national monuments and to roll back protections of these public lands. Protected public lands are an important part of what makes America great. I strongly urge you to oppose any efforts to eliminate or shrink our national monuments.\n\nSince President Theodore Roosevelt signed the Antiquities Act into law in 1906, 16 Presidents - 8 Republicans and 8 Democrats - have used the authority granted by the act to safeguard public lands, oceans, and historic sites in order to share America's story with future generations. These national monument designations are broadly supported from coast to coast and provide a myriad of benefits to local communities, including economic boosts from tourism, places to enjoy the outdoors, clean air and water, protection for ecologically sensitive areas, and windows into our country's history.\n\nSending a signal that protections for our shared history, culture, and natural treasures are temporary would set a terrible precedent. National monuments have been shown to be tremendous drivers of the $887 billion outdoor recreation economy and businesses rely on the permanency of these protections when making decisions about investing in these communities.\n\nFrom Maine's magnificent Katahdin Woods to the colorful canyons of Utah's Grand Staircase-Escalante to the western history held in New Mexico's Organ Mountains-Desert Peaks, these landmarks, landscapes, and seascapes have value which far exceeds their physical features; they manifest the core democratic ideals of freedom, justice, and equality. They are our legacy to our children and our children's children, and a gift that belongs to all Americans.\n\nI am firmly opposed to any effort to revoke or diminish protections for our national monuments. I urge you to support our public lands and waters and recommend that our current national monuments remain as they are today.\n\nSincerely,\nNic Brooksher\n  Baton Rouge, LA 70808"
+'Fruit peel, candied'
+~~~
+{:.output}
+
+
+Here are the names and values of some of the nutrients for the first item returned by the query.
+
+
+
+~~~python
+> [ (nutrient['nutrientName'], nutrient['value']) for nutrient in fruit['foodNutrients'][:9] ]
+~~~
+{:title="Console" .input}
+
+
+~~~
+[('Protein', 0.34), ('Total lipid (fat)', 0.07), ('Carbohydrate, by difference', 82.74), ('Energy', 322.0), ('Alcohol, ethyl', 0.0), ('Water', 16.7), ('Caffeine', 0.0), ('Theobromine', 0.0), ('Sugars, total including NLEA', 80.68)]
 ~~~
 {:.output}
 
@@ -218,7 +217,7 @@ response.
 
 
 ~~~python
-from schema import Session, Comment
+from schema import Session, Food
 
 session = Session()
 engine = session.bind
@@ -228,43 +227,45 @@ engine = session.bind
 
 ===
 
-You could inspect the BENM database now using any sqlite3 client: you
-would find one empty "comment" table with fields "id" and "comment".
+You could inspect the fruit database now using any sqlite3 client: you
+would find one empty "food" table with fields "id", "name", and "sugar".
 
 ===
 
-Add a new `rpp` parameter to request `100` documents per page.
+Add a new `pageSize` parameter to request `100` documents per page.
 
 
 
 
 ~~~python
-query['rpp'] = 10
+query['pageSize'] = 100
 ~~~
 {:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
 
 ===
 
-In each request, advance the query parameter `po` to the number of the
-record you want the response to begin with. Insert the documents (the
-key:value pairs stored in `values`) in bulk to the database with
-`engine.execute()`.
+In each request, advance the query parameter `pageNumber` by one. 
+The first record retrieved will be `pageNumber * pageSize`. 
+Insert the fruits (the key:value pairs stored in `values`) 
+in bulk to the database with `engine.execute()`.
 
 
 
 ~~~python
-table = Comment.metadata.tables['comment']
-for i in range(0, 15):
+table = Food.metadata.tables['food']
+for i in range(0, 10):
     
     # advance page and query
-    query['po'] = i * query['rpp']
+    query['pageNumber'] = i 
     response = requests.get(api + path, params=query)
     page = response.json()
-    docs = page['documents']
+    fruits = page['foods']
     
     # save page with session engine
-    values = [{'comment': doc['commentText']} for doc in docs]
+    values = [{'name': fruit['description'],
+               'sugar': next(iter([ nutrient['value'] for nutrient in fruit['foodNutrients'] if nutrient['nutrientName'][0:5] == 'Sugar' ]), None) } for fruit in fruits]
+               
     insert = table.insert().values(values)
     engine.execute(insert)
 ~~~
@@ -272,21 +273,16 @@ for i in range(0, 15):
 
 
 ~~~
-<sqlalchemy.engine.result.ResultProxy object at 0x128383250>
-<sqlalchemy.engine.result.ResultProxy object at 0x12837a790>
-<sqlalchemy.engine.result.ResultProxy object at 0x12837ced0>
-<sqlalchemy.engine.result.ResultProxy object at 0x12838b110>
-<sqlalchemy.engine.result.ResultProxy object at 0x128386c50>
-<sqlalchemy.engine.result.ResultProxy object at 0x128386b10>
-<sqlalchemy.engine.result.ResultProxy object at 0x12838b290>
-<sqlalchemy.engine.result.ResultProxy object at 0x12837a850>
-<sqlalchemy.engine.result.ResultProxy object at 0x128386190>
-<sqlalchemy.engine.result.ResultProxy object at 0x128390750>
-<sqlalchemy.engine.result.ResultProxy object at 0x128396610>
-<sqlalchemy.engine.result.ResultProxy object at 0x128394bd0>
-<sqlalchemy.engine.result.ResultProxy object at 0x1265cef50>
-<sqlalchemy.engine.result.ResultProxy object at 0x12837a290>
-<sqlalchemy.engine.result.ResultProxy object at 0x12838f590>
+<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c980da0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c92d390>
+<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c998128>
+<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c92d9e8>
+<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c927cc0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7fd66bbf4320>
+<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c92c748>
+<sqlalchemy.engine.result.ResultProxy object at 0x7fd66ddeeac8>
+<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c9318d0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c984240>
 ~~~
 {:.output}
 
@@ -299,7 +295,9 @@ everyting we have so far back into a `DataFrame`.
 
 
 ~~~python
-df = pd.read_sql_table('comment', engine)
+import pandas as pd
+
+df = pd.read_sql_table('food', engine)
 ~~~
 {:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 

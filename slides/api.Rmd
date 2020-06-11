@@ -45,7 +45,7 @@ the URL in a standards compliant way that the service will recognize.
 | `in=state:*` | third query parameter |
 |---+---|
 | `#`          | beginning of the **fragment** component of a URL |
-| `irrelevant` | a document section, it isn't even sent to the server |
+| `irrelephant` | a document section, it isn't even sent to the server |
 
 ===
 

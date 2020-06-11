@@ -50,7 +50,7 @@ doc = BeautifulSoup(response.text, 'lxml')
 
 
 ~~~
-'<!DOCTYPE html>\n<html>\n <head>\n  <link href="/s/b0dcca.css" rel="stylesheet" title="Default" type="text/css"/>\n  <title>\n   xkcd: Server Attention Span\n  </title>\n  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>\n  <link href="/s/919f27.ico" rel="shortcut icon" type="image/x-icon"/>\n  <link href="/s/919f27.ico" rel="icon" type="image/x-icon"/>'
+'<!DOCTYPE html>\n<html>\n <head>\n  <link href="/s/7d94e0.css" rel="stylesheet" title="Default" type="text/css"/>\n  <title>\n   xkcd: Server Attention Span\n  </title>\n  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>\n  <link href="/s/919f27.ico" rel="shortcut icon" type="image/x-icon"/>\n  <link href="/s/919f27.ico" rel="icon" type="image/x-icon"/>'
 ~~~
 {:.output}
 

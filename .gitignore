@@ -10,3 +10,10 @@ cache/
 docs/_site
 docs/.bundle
 docs/Gemfile.lock
+
+# Local data.gov api key
+*api_key.py
+
+# Local copy of database generated in lesson
+fruits.db
+

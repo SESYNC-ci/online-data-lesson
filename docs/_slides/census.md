@@ -29,7 +29,7 @@ c.acs5
 
 
 ~~~
-<census.core.ACS5Client object at 0x128c91ad0>
+<census.core.ACS5Client object at 0x7fd66ca174e0>
 ~~~
 {:.output}
 
@@ -41,7 +41,7 @@ Compared to using the API directly via the [requests](){:.pylib} package:
 **Pros**
 - More concise code, quicker development
 - Package documentation (if present) is usually more user friendly than API documentaion.
-- May allow seemless update if API changes
+- May allow seamless update if API changes
 
 **Cons**
 - No guarantee of updates
@@ -80,7 +80,7 @@ response[0]
 
 
 ~~~
-{'NAME': 'Census Tract 105.01, Wicomico County, Maryland', 'B19013_001E': 68652.0, 'state': '24', 'county': '045', 'tract': '010501'}
+{'tract': '010501', 'B19013_001E': 68652.0, 'county': '045', 'NAME': 'Census Tract 105.01, Wicomico County, Maryland', 'state': '24'}
 ~~~
 {:.output}
 

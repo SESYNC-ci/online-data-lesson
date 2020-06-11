@@ -31,7 +31,7 @@ Compared to using the API directly via the [requests](){:.pylib} package:
 **Pros**
 - More concise code, quicker development
 - Package documentation (if present) is usually more user friendly than API documentaion.
-- May allow seemless update if API changes
+- May allow seamless update if API changes
 
 **Cons**
 - No guarantee of updates
