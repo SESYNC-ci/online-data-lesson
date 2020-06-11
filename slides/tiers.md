@@ -1,10 +1,10 @@
 ---
 ---
 
-## Aquiring Online Data
+## Acquiring Online Data
 
 Data can be available on the web in many different forms. The difficulty you
-will have aquiring that data for running analyses depends on which of three
+will have acquiring that data for running analyses depends on which of three
 approaches the data source requires.
 
 ===
