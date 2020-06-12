@@ -20,10 +20,14 @@ file with the single variable `API_KEY = your many digit key`.
 
 ===
 
-The "data.gov" API provides a case in point. **more info re api** 
+The [data.gov](https://www.data.gov) API provides a case in point. 
+Data.gov is a service provided by the U.S. federal government to make data available
+from across many government agencies. It hosts a catalog of raw data and of many other
+APIs from across government.
+Among the APIs catalogued by data.gov is the [FoodData Central](https://fdc.nal.usda.gov/) API.
 The U.S. Department of Agriculture maintains a data system of nutrition information 
-for thousands of foods at [FoodData Central](https://fdc.nal.usda.gov/). We might
-be interested in the relative nutrient content of different fruits.
+for thousands of foods. 
+We might be interested in the relative nutrient content of different fruits.
 
 ===
 
@@ -44,7 +48,7 @@ query = {
     'api_key':API_KEY,
     'query':'fruit',
 }
-fruits = (
+doc = (
     requests
     .get(api + path, params=query)
     .json()
@@ -58,7 +62,7 @@ Python dictionary called `doc`. To inspect the return, we can list
 the dictionary keys.
 
 ```{python}
-list(fruits.keys())
+list(doc.keys())
 ```
 
 ===
@@ -67,7 +71,7 @@ We can print the value associated with the key `totalHits` to see
 how many foods matched our search term, `"fruit"`.
 
 ```{python}
-fruits['totalHits']
+doc['totalHits']
 ```
 
 ===
@@ -76,7 +80,7 @@ The purported claimed number of results is much larger than the length
 of the `foods` array contained in this response.
 
 ```{python}
-len(fruits['foods'])
+len(doc['foods'])
 ```
 
 ===
@@ -135,7 +139,7 @@ For each fruit, we'll store its name and the amount of sugar
 (grams of sugar per 100 grams of fruit) found in the API response.
 
 ```{python}
-fruit = fruits['foods'].pop()
+fruit = doc['foods'].pop()
 fruit['description']
 ```
 
