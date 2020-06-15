@@ -3,6 +3,9 @@
 .Rproj.user
 cache/
 
+# Python cache
+__pycache__/
+
 # Jupyter
 .ipynb_checkpoints/
 

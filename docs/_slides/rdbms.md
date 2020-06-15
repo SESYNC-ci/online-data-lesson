@@ -4,7 +4,7 @@
 ## Paging & Stashing
 
 A common strategy that web service providers take to balance their
-load, is to limit the number of records a single API request can
+load is to limit the number of records a single API request can
 return. The user ends up having to flip through "pages" with the API,
 handling the response content at each iteration. Options for stashing
 data are:
@@ -20,10 +20,14 @@ file with the single variable `API_KEY = your many digit key`.
 
 ===
 
-The "data.gov" API provides a case in point. **more info re api** 
+The [data.gov](https://www.data.gov) API provides a case in point. 
+Data.gov is a service provided by the U.S. federal government to make data available
+from across many government agencies. It hosts a catalog of raw data and of many other
+APIs from across government.
+Among the APIs catalogued by data.gov is the [FoodData Central](https://fdc.nal.usda.gov/) API.
 The U.S. Department of Agriculture maintains a data system of nutrition information 
-for thousands of foods at [FoodData Central](https://fdc.nal.usda.gov/). We might
-be interested in the relative nutrient content of different fruits.
+for thousands of foods. 
+We might be interested in the relative nutrient content of different fruits.
 
 ===
 
@@ -39,6 +43,8 @@ Load the `API_KEY` variable by running a file you have saved it in.
 
 ===
 
+Run an API query for all foods with `"fruit"` in their name.
+
 
 
 ~~~python
@@ -50,7 +56,7 @@ query = {
     'api_key':API_KEY,
     'query':'fruit',
 }
-fruits = (
+doc = (
     requests
     .get(api + path, params=query)
     .json()
@@ -68,13 +74,13 @@ the dictionary keys.
 
 
 ~~~python
-> list(fruits.keys())
+> list(doc.keys())
 ~~~
 {:title="Console" .input}
 
 
 ~~~
-['foods', 'foodSearchCriteria', 'totalHits', 'currentPage', 'totalPages']
+['foodSearchCriteria', 'totalPages', 'totalHits', 'foods', 'currentPage']
 ~~~
 {:.output}
 
@@ -87,7 +93,7 @@ how many foods matched our search term, `"fruit"`.
 
 
 ~~~python
-> fruits['totalHits']
+> doc['totalHits']
 ~~~
 {:title="Console" .input}
 
@@ -101,12 +107,13 @@ how many foods matched our search term, `"fruit"`.
 ===
 
 The purported claimed number of results is much larger than the length
-of the `foods` array contained in this response.
+of the `foods` array contained in this response. The query returned only the
+first page, with 50 items.
 
 
 
 ~~~python
-> len(fruits['foods'])
+> len(doc['foods'])
 ~~~
 {:title="Console" .input}
 
@@ -120,8 +127,8 @@ of the `foods` array contained in this response.
 ===
 
 The following commands prepare Python to connect to a
-database-in-a-file, and creates empty tables in the database if they
-do not already exist (i.e. it is safe to re-run after you have
+database-in-a-file, and create empty tables in the database if they
+do not already exist (meaning that it is safe to re-run after you have
 populated the database).
 
 ===
@@ -149,7 +156,7 @@ Base = declarative_base()
 
 Define the tables that are going to live in the database
 using Python classes. For each class, its attributes
-will map to columns in a table.
+will map to columns in a table. Then create a session engine.
 
 
 
@@ -183,7 +190,7 @@ For each fruit, we'll store its name and the amount of sugar
 
 
 ~~~python
-> fruit = fruits['foods'].pop()
+> fruit = doc['foods'].pop()
 + fruit['description']
 ~~~
 {:title="Console" .input}
@@ -250,6 +257,11 @@ The first record retrieved will be `pageNumber * pageSize`.
 Insert the fruits (the key:value pairs stored in `values`) 
 in bulk to the database with `engine.execute()`.
 
+In each iteration of the loop, we use a list comprehension to
+extract the value corresponding to the amount of sugar from each
+of the foods in the page of results returned by the query.
+{:.notes}
+
 
 
 ~~~python
@@ -273,16 +285,16 @@ for i in range(0, 10):
 
 
 ~~~
-<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c980da0>
-<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c92d390>
-<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c998128>
-<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c92d9e8>
-<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c927cc0>
-<sqlalchemy.engine.result.ResultProxy object at 0x7fd66bbf4320>
-<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c92c748>
-<sqlalchemy.engine.result.ResultProxy object at 0x7fd66ddeeac8>
-<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c9318d0>
-<sqlalchemy.engine.result.ResultProxy object at 0x7fd66c984240>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f734c01f5c0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f734d3a2780>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f734e4f98d0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f734e7315f8>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f734e5000b8>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f734e735fd0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f734e506898>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f734e738e48>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f734e50e278>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f734e742240>
 ~~~
 {:.output}
 

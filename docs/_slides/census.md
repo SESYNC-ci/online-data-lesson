@@ -13,7 +13,7 @@ exists: a dedicated package in your programming language's repository
 
 ===
 
-The [census](){:.pylib} package is a user contributed suite of tools
+The [census](){:.pylib} package is a user-contributed suite of tools
 that streamline access to the API.
 
 
@@ -29,7 +29,7 @@ c.acs5
 
 
 ~~~
-<census.core.ACS5Client object at 0x7fd66ca174e0>
+<census.core.ACS5Client object at 0x7f734d50c128>
 ~~~
 {:.output}
 
@@ -40,7 +40,7 @@ Compared to using the API directly via the [requests](){:.pylib} package:
 
 **Pros**
 - More concise code, quicker development
-- Package documentation (if present) is usually more user friendly than API documentaion.
+- Package documentation (if present) is usually more user-friendly than API documentaion.
 - May allow seamless update if API changes
 
 **Cons**
@@ -49,8 +49,8 @@ Compared to using the API directly via the [requests](){:.pylib} package:
 
 ===
 
-Query the Census ACS5 survey for the variable `B19001_001E` and each
-entity's `NAME`.
+Query the Census ACS5 survey for the variable `B19001_001E` (median annual household income,
+in dollars) and each entity's `NAME`.
 
 
 
@@ -62,8 +62,9 @@ variables = ('NAME', 'B19013_001E')
 
 ===
 
-The [census](){:.pylib} package converts the JSON string into a Python
-dictionary. (No need to check headers.)
+This code pulls the variables `NAME` and `B19001_001E` from all census tracts and all
+counties in the state with ID `24` (Maryland). The [census](){:.pylib} package converts the JSON string 
+into a Python dictionary. (No need to check headers.) 
 
 
 
@@ -80,7 +81,7 @@ response[0]
 
 
 ~~~
-{'tract': '010501', 'B19013_001E': 68652.0, 'county': '045', 'NAME': 'Census Tract 105.01, Wicomico County, Maryland', 'state': '24'}
+{'NAME': 'Census Tract 105.01, Wicomico County, Maryland', 'tract': '010501', 'state': '24', 'county': '045', 'B19013_001E': 68652.0}
 ~~~
 {:.output}
 
@@ -88,7 +89,8 @@ response[0]
 ===
 
 The Pandas `DataFrame()` constructor will accept the list of
-dictionaries as the sole argument, taking column names from "keys".
+dictionaries as the sole argument, taking column names from "keys". 
+This code also removes values less than zero.
 
 
 
@@ -104,7 +106,9 @@ df = (
 
 ===
 
-The [seaborn](){:.pylib} package provides some nice, quick visualizations.
+The [seaborn](){:.pylib} package provides some nice, quick visualizations. Here
+we create boxplots showing the income distribution among census tracts within
+each county in Maryland.
 
 
 

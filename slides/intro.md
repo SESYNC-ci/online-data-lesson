@@ -4,7 +4,7 @@
 ## Lesson Objectives
 
 - Distinguish three types of online data
-- Breakdown how web services use HTTP
+- Break down how web services use HTTP
 - Learn Python tools for data acquisition
 
 ===

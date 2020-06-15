@@ -12,7 +12,8 @@ serve](https://xkcd.com/869/).
 ===
 
 The [requests](){:.pylib} package provides a simple interface to
-issueing HTTP requests and handling the response.
+issuing HTTP requests and handling the response. Here's an example
+using an [XKCD comic](https://xkcd.com/869/).
 
 
 
@@ -33,10 +34,10 @@ response
 
 ===
 
-The response is still binary, it takes a browser-like parser to
+The response is still binary. It takes a browser-like parser to
 translate the raw content into an HTML
 document. [BeautifulSoup](){:.pylib} does a fair job, while making no
-attempt to "render" a human readable page.
+attempt to "render" a human-readable page.
 
 
 
@@ -58,7 +59,7 @@ doc = BeautifulSoup(response.text, 'lxml')
 ===
 
 Searching the document for desired content is the hard part. This search
-uses a CSS query, to find the image below a section of the document with
+uses a CSS query to find the image below a section of the document with
 attribute `id = comic`.
 
 
@@ -112,7 +113,7 @@ Pages designed for humans are increasingly harder to parse programmatically.
 
 Sites with easilly accessible html tables nowadays may be specifically
 geared toward non-human agents. The US Census provides some
-documentation for their data services in a massive such table:
+documentation for their data services in a massive table:
 
 <https://api.census.gov/data/2017/acs/acs5/variables.html>
 
@@ -149,7 +150,7 @@ vars.head()
 ===
 
 We can use our data manipulation tools to search this unwieldy
-documentation for variables of interest
+documentation for variables of interest.
 
 
 

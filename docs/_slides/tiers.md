@@ -3,16 +3,16 @@
 
 ## Acquiring Online Data
 
-Data can be available on the web in many different forms. The difficulty you
-will have acquiring that data for running analyses depends on which of three
-approaches the data source requires.
+Data is available on the web in many different forms. How difficult is it to 
+acquire that data to run analyses? It depends which approach the data source
+require. There are three main approaches:
 
 ===
 
 ## Scraping 🙁
 
 If a web browser can read HTML and JavaScript and display a human readable page,
-why can't you right a program (a "bot") to read HTML and JavaScript and store the
+why can't you write a program (a "bot") to read HTML and JavaScript and store the
 data?
 
 ===
@@ -30,4 +30,4 @@ This is not the fastest protocol for moving large datasets, but it is universal
 
 Major data providers can justify writing a package, specific to your
 language of choice (e.g. Python or R), that facilitates accessing the
-data they provide through a web service. Sadly ... not all do so.
+data they provide through a web service. Sadly, not all do so.
