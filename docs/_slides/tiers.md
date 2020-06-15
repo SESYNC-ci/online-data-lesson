@@ -4,12 +4,16 @@
 ## Acquiring Online Data
 
 Data is available on the web in many different forms. How difficult is it to 
-acquire that data to run analyses? It depends which approach the data source
-require. There are three main approaches:
+acquire that data to run analyses? It depends which of three approaches
+the data source requires:
+
+- Web scraping
+- Web service or API
+- API wrapper
 
 ===
 
-## Scraping 🙁
+## Web Scraping 🙁
 
 If a web browser can read HTML and JavaScript and display a human readable page,
 why can't you write a program (a "bot") to read HTML and JavaScript and store the

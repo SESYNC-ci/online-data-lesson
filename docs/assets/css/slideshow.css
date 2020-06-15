@@ -12,7 +12,8 @@ img + br + em {
 }
 
 .reveal table {
-    font-size: 90%;
+    font-size: 70%;
+    max-height: 300px;
 }
 
 .reveal pre {

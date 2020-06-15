@@ -17,4 +17,4 @@ Central API. Use the API to collect 3 "pages" of food results matching a search
 term of your choice. Modify `schema.py` to save the names and sugar contents of the
 foods into a new SQLite file.
 
-[API key for data.gov]: https://regulationsgov.github.io/developers/
+[API key for data.gov]: https://api.data.gov/signup/
