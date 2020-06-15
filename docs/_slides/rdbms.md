@@ -14,8 +14,9 @@ data are:
 1. Offload these decisions to database management software.
 
 To repeat the exercise below at home, request an API key at
-https://api.data.gov/signup/, and store it in an adjacent `api_key.py`
-file with the single variable `API_KEY = your many digit key`.
+https://api.data.gov/signup/, and store it in a file named `api_key.py`
+in your working directory. The file should contain the single line 
+`API_KEY = your many digit key`.
 {:.notes}
 
 ===
@@ -31,12 +32,12 @@ We might be interested in the relative nutrient content of different fruits.
 
 ===
 
-Load the `API_KEY` variable by running a file you have saved it in.
+Load the `API_KEY` variable by importing it from the file you saved it in.
 
 
 
 ~~~python
-> exec(open("api_key.py").read())
+> from api_key import API_KEY
 ~~~
 {:title="Console" .input}
 
@@ -80,7 +81,7 @@ the dictionary keys.
 
 
 ~~~
-['foodSearchCriteria', 'totalPages', 'totalHits', 'foods', 'currentPage']
+['currentPage', 'foodSearchCriteria', 'totalPages', 'totalHits', 'foods']
 ~~~
 {:.output}
 
@@ -285,16 +286,16 @@ for i in range(0, 10):
 
 
 ~~~
-<sqlalchemy.engine.result.ResultProxy object at 0x7f734c01f5c0>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f734d3a2780>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f734e4f98d0>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f734e7315f8>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f734e5000b8>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f734e735fd0>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f734e506898>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f734e738e48>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f734e50e278>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f734e742240>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f0e44c2b630>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f0e45faf828>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f0e47104860>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f0e4733c780>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f0e4710b128>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f0e473436a0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f0e471112b0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f0e4733cbe0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f0e47119630>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f0e474eeef0>
 ~~~
 {:.output}
 
