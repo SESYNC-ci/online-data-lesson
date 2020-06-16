@@ -13,14 +13,6 @@ data are:
 1. Append each response to a file, writing frequently.
 1. Offload these decisions to database management software.
 
-To repeat the exercise below at home, request an API key at
-https://api.data.gov/signup/, and store it in a file named `api_key.py`
-in your working directory. The file should contain the single line 
-`API_KEY = your many digit key`.
-{:.notes}
-
-===
-
 The [data.gov](https://www.data.gov) API provides a case in point. 
 Data.gov is a service provided by the U.S. federal government to make data available
 from across many government agencies. It hosts a catalog of raw data and of many other
@@ -29,6 +21,13 @@ Among the APIs catalogued by data.gov is the [FoodData Central](https://fdc.nal.
 The U.S. Department of Agriculture maintains a data system of nutrition information 
 for thousands of foods. 
 We might be interested in the relative nutrient content of different fruits.
+{:.notes}
+
+To repeat the exercise below at home, request an API key at
+https://api.data.gov/signup/, and store it in a file named `api_key.py`
+in your working directory. The file should contain the single line 
+`API_KEY = your many digit key`.
+{:.notes}
 
 ===
 
@@ -81,7 +80,7 @@ the dictionary keys.
 
 
 ~~~
-['currentPage', 'foodSearchCriteria', 'totalPages', 'totalHits', 'foods']
+['foodSearchCriteria', 'totalPages', 'foods', 'totalHits', 'currentPage']
 ~~~
 {:.output}
 
@@ -203,7 +202,9 @@ For each fruit, we'll store its name and the amount of sugar
 {:.output}
 
 
-Here are the names and values of some of the nutrients for the first item returned by the query.
+===
+
+Extract the names and values of the first ten nutrients for the first item returned by the query.
 
 
 
@@ -286,16 +287,16 @@ for i in range(0, 10):
 
 
 ~~~
-<sqlalchemy.engine.result.ResultProxy object at 0x7f0e44c2b630>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f0e45faf828>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f0e47104860>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f0e4733c780>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f0e4710b128>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f0e473436a0>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f0e471112b0>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f0e4733cbe0>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f0e47119630>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f0e474eeef0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f74f1f91630>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f74f33927f0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f74f44e9860>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f74f47227b8>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f74f3453550>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f74f4729e48>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f74f44f60b8>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f74f47336a0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f74f44f65f8>
+<sqlalchemy.engine.result.ResultProxy object at 0x7f74f4733b00>
 ~~~
 {:.output}
 
