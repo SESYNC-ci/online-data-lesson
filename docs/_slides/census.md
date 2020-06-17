@@ -49,8 +49,15 @@ Compared to using the API directly via the [requests](){:.pylib} package:
 
 ===
 
-Query the Census ACS5 survey for the variable `B19001_001E` (median annual household income,
+Query the Census ACS5 ([American Community Survey](https://www.census.gov/programs-surveys/acs)) 
+for the variable `B19001_001E` (median annual household income,
 in dollars) and each entity's `NAME`.
+
+The American Community Survey (ACS) is a yearly survey that provides detailed population
+and housing information at fine geographic scale across the United States. Much of the 
+[census](){:.pylib} package is dedicated to accessing the ACS data. ACS5 refers to a five-year
+average of the annual surveys.
+{:.notes}
 
 
 

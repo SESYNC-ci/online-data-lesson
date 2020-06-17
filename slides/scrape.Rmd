@@ -49,8 +49,8 @@ img
 
 ===
 
-It makes sense to query by CSS if the content being scraped always appears
-the same in a browser; stylesheets are separate from delivered content.
+It is possible to query by CSS for a single element and extract
+attributes such as the image title.
 
 ```{python, handout = 0}
 img = doc.select_one('#comic > img')
@@ -71,9 +71,9 @@ Pages designed for humans are increasingly harder to parse programmatically.
 
 ## HTML Tables
 
-Sites with easilly accessible html tables nowadays may be specifically
-geared toward non-human agents. The US Census provides some
-documentation for their data services in a massive table:
+Sites with easily accessible html tables nowadays may be specifically
+intended to be parsed programmatically, rather than browsed by a human reader. 
+The US Census provides some documentation for their data services in a massive table:
 
 <https://api.census.gov/data/2017/acs/acs5/variables.html>
 

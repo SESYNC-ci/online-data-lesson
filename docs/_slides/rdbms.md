@@ -304,7 +304,7 @@ for i in range(0, 10):
 ===
 
 View the records in the database by reading
-everyting we have so far back into a `DataFrame`.
+everything we have so far back into a `DataFrame`.
 
 
 
