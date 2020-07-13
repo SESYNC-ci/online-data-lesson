@@ -29,7 +29,7 @@ c.acs5
 
 
 ~~~
-<census.core.ACS5Client object at 0x7f74f34f9358>
+<census.core.ACS5Client object at 0x7efe9cb75b00>
 ~~~
 {:.output}
 
@@ -88,7 +88,7 @@ response[0]
 
 
 ~~~
-{'NAME': 'Census Tract 105.01, Wicomico County, Maryland', 'state': '24', 'B19013_001E': 68652.0, 'county': '045', 'tract': '010501'}
+{'state': '24', 'county': '045', 'tract': '010501', 'NAME': 'Census Tract 105.01, Wicomico County, Maryland', 'B19013_001E': 68652.0}
 ~~~
 {:.output}
 

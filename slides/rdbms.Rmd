@@ -50,11 +50,11 @@ query = {
     'api_key':API_KEY,
     'query':'fruit',
 }
-doc = (
+response = (
     requests
     .get(api + path, params=query)
-    .json()
 )
+doc = response.json()
 ```
 
 ===

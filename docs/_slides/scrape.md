@@ -122,16 +122,16 @@ The US Census provides some documentation for their data services in a massive t
 
 
 ~~~python
-import pandas as pd
-
-vars = (
-  pd
-  .read_html('https://api.census.gov/data/2017/acs/acs5/variables.html')
-  .pop()
-)
-vars.head()
+> import pandas as pd
++ 
++ vars = (
++   pd
++   .read_html('https://api.census.gov/data/2017/acs/acs5/variables.html')
++   .pop()
++ )
++ vars.head()
 ~~~
-{:title="{{ site.data.lesson.handouts[0] }}" .text-document}
+{:title="Console" .input}
 
 
 ~~~

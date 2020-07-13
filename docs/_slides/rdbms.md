@@ -56,11 +56,11 @@ query = {
     'api_key':API_KEY,
     'query':'fruit',
 }
-doc = (
+response = (
     requests
     .get(api + path, params=query)
-    .json()
 )
+doc = response.json()
 ~~~
 {:title="{{ site.data.lesson.handouts[0] }}" .text-document}
 
@@ -80,7 +80,7 @@ the dictionary keys.
 
 
 ~~~
-['foodSearchCriteria', 'totalPages', 'foods', 'totalHits', 'currentPage']
+['foods', 'foodSearchCriteria', 'totalHits', 'currentPage', 'totalPages']
 ~~~
 {:.output}
 
@@ -99,7 +99,7 @@ how many foods matched our search term, `"fruit"`.
 
 
 ~~~
-17833
+18801
 ~~~
 {:.output}
 
@@ -287,16 +287,16 @@ for i in range(0, 10):
 
 
 ~~~
-<sqlalchemy.engine.result.ResultProxy object at 0x7f74f1f91630>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f74f33927f0>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f74f44e9860>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f74f47227b8>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f74f3453550>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f74f4729e48>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f74f44f60b8>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f74f47336a0>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f74f44f65f8>
-<sqlalchemy.engine.result.ResultProxy object at 0x7f74f4733b00>
+<sqlalchemy.engine.result.ResultProxy object at 0x7efe9b686da0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7efe9b492f60>
+<sqlalchemy.engine.result.ResultProxy object at 0x7efe9db07160>
+<sqlalchemy.engine.result.ResultProxy object at 0x7efe9dda33c8>
+<sqlalchemy.engine.result.ResultProxy object at 0x7efe9db07cc0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7efe9dda7630>
+<sqlalchemy.engine.result.ResultProxy object at 0x7efe9da90cc0>
+<sqlalchemy.engine.result.ResultProxy object at 0x7efe9ddb05f8>
+<sqlalchemy.engine.result.ResultProxy object at 0x7efe9da9ad68>
+<sqlalchemy.engine.result.ResultProxy object at 0x7efe9ddb2278>
 ~~~
 {:.output}
 

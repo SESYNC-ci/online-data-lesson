@@ -79,7 +79,7 @@ The US Census provides some documentation for their data services in a massive t
 
 ===
 
-```{python, handout = 0}
+```{python}
 import pandas as pd
 
 vars = (
