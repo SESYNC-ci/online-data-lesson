@@ -1,0 +1,853 @@
+---
+---
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Online Data</title>
+<meta name="description" content="Acquire data from websites and APIs.">
+<link rel="canonical"
+      href="https://SESYNC-ci.github.io/online-data-lesson/2020/07/21/index.html">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SESYNC-ci/lesson-style@3.0/docs/assets/css/default.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SESYNC-ci/lesson-style@3.0/docs/assets/css/syntax.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/SESYNC-ci/lesson-style@3.0/docs/assets/css/static.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<link href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+      rel="stylesheet"
+      integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
+      crossorigin="anonymous">
+
+    
+  </head>
+  <body>
+    <div class="page-content">
+      <div class="wrapper">
+        
+
+<h1 style="text-transform: none;" id="online-data">Online Data</h1>
+
+<p>Lesson 13 with **</p>
+
+<nav id="ToC">
+
+  <ul>
+    <li><a href="#/slides/intro">Lesson Objectives</a></li>
+    <li><a href="#/slides/tiers">Acquiring Online Data</a></li>
+    <li><a href="#/slides/scrape">Requests</a></li>
+    <li><a href="#/slides/api">Web Services</a></li>
+    <li><a href="#/slides/census">Specialized Packages</a></li>
+    <li><a href="#/slides/rdbms">Paging &amp; Stashing</a></li>
+    <li><a href="#/slides/conclude">Takeaway</a></li>
+    <li><a href="#/slides/exercise">Exercises</a></li>
+  </ul>
+</nav>
+
+<hr />
+<p><a name="/slides/intro"></a></p>
+
+<h2 id="lesson-objectives">Lesson Objectives</h2>
+
+<ul>
+  <li>Distinguish three types of online data</li>
+  <li>Break down how web services use HTTP</li>
+  <li>Learn Python tools for data acquisition</li>
+</ul>
+
+<h2 id="specific-achievements">Specific Achievements</h2>
+
+<ul>
+  <li>Programatically acquire data embedded in a web page</li>
+  <li>Request data through a REST API</li>
+  <li>Use the <a href="" class="pylib">census</a> package to acquire data</li>
+  <li>Use SQLite for caching</li>
+</ul>
+
+<h2 id="why-script-data-acquistion">Why script data acquistion?</h2>
+
+<ul>
+  <li>Too time intensive to acquire manually</li>
+  <li>Integrate updated or new data</li>
+  <li>Reproducibility</li>
+  <li>There’s an API between you and the data</li>
+</ul>
+
+<p class="ToS"><a href="#/slides/intro">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/tiers"></a></p>
+
+<h2 id="acquiring-online-data">Acquiring Online Data</h2>
+
+<p>Data is available on the web in many different forms. How difficult is it to 
+acquire that data to run analyses? It depends which of three approaches
+the data source requires:</p>
+
+<ul>
+  <li>Web scraping</li>
+  <li>Web service or API</li>
+  <li>API wrapper</li>
+</ul>
+
+<h2 id="web-scraping-">Web Scraping 🙁</h2>
+
+<p>If a web browser can read HTML and JavaScript and display a human readable page,
+why can’t you write a program (a “bot”) to read HTML and JavaScript and store the
+data?</p>
+
+<h2 id="web-service-or-api-">Web Service or API 😉</h2>
+
+<p>An Application Programming Interface (API, as opposed to GUI) that is compatible
+with passing data around the internet using HTTP (Hyper-text Transfer Protocol).
+This is not the fastest protocol for moving large datasets, but it is universal
+(it underpins web browsers, after all).</p>
+
+<h2 id="api-wrapper-">API Wrapper 😂</h2>
+
+<p>Major data providers can justify writing a package, specific to your
+language of choice (e.g. Python or R), that facilitates accessing the
+data they provide through a web service. Sadly, not all do so.</p>
+
+<p class="ToS"><a href="#/slides/tiers">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/scrape"></a></p>
+
+<h2 id="requests">Requests</h2>
+
+<p>That “http” at the beginning of the URL for a possible data source is
+a protocol—an understanding between a client and a server about how
+to communicate. The client does not have to be a web browser, so long
+as it knows the protocol. After all, <a href="https://xkcd.com/869/">servers exist to
+serve</a>.</p>
+
+<p>The <a href="" class="pylib">requests</a> package provides a simple interface to
+issuing HTTP requests and handling the response. Here’s an example
+using an <a href="https://xkcd.com/869/">XKCD comic</a>.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://xkcd.com/869'</span><span class="p">)</span>
+<span class="n">response</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;Response [200]&gt;
+</code></pre></div></div>
+
+<p>The response is still binary. It takes a browser-like parser to
+translate the raw content into an HTML
+document. <a href="" class="pylib">BeautifulSoup</a> does a fair job, while making no
+attempt to “render” a human-readable page.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+<span class="n">doc</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">text</span><span class="p">,</span> <span class="s">'lxml'</span><span class="p">)</span>
+<span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">doc</span><span class="p">.</span><span class="n">prettify</span><span class="p">().</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">])</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>'&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n &lt;head&gt;\n  &lt;link href="/s/7d94e0.css" rel="stylesheet" title="Default" type="text/css"/&gt;\n  &lt;title&gt;\n   xkcd: Server Attention Span\n  &lt;/title&gt;\n  &lt;meta content="IE=edge" http-equiv="X-UA-Compatible"/&gt;\n  &lt;link href="/s/919f27.ico" rel="shortcut icon" type="image/x-icon"/&gt;\n  &lt;link href="/s/919f27.ico" rel="icon" type="image/x-icon"/&gt;'
+</code></pre></div></div>
+
+<p>Searching the document for desired content is the hard part. This search
+uses a CSS query to find the image below a section of the document with
+attribute <code class="language-plaintext highlighter-rouge">id = comic</code>.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">img</span> <span class="o">=</span> <span class="n">doc</span><span class="p">.</span><span class="n">select</span><span class="p">(</span><span class="s">'#comic &gt; img'</span><span class="p">)</span>
+<span class="n">img</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[&lt;img alt="Server Attention Span" src="//imgs.xkcd.com/comics/server_attention_span.png" title="They have to keep the adjacent rack units empty. Otherwise, half the entries in their /var/log/syslog are just 'SERVER BELOW TRYING TO START CONVERSATION *AGAIN*.' and 'WISH THEY'D STOP GIVING HIM SO MUCH COFFEE IT SPLATTERS EVERYWHERE.'"/&gt;]
+</code></pre></div></div>
+
+<p>It is possible to query by CSS for a single element and extract
+attributes such as the image title.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">img</span> <span class="o">=</span> <span class="n">doc</span><span class="p">.</span><span class="n">select_one</span><span class="p">(</span><span class="s">'#comic &gt; img'</span><span class="p">)</span>
+<span class="n">img</span><span class="p">[</span><span class="s">'title'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"They have to keep the adjacent rack units empty. Otherwise, half the entries in their /var/log/syslog are just 'SERVER BELOW TRYING TO START CONVERSATION *AGAIN*.' and 'WISH THEY'D STOP GIVING HIM SO MUCH COFFEE IT SPLATTERS EVERYWHERE.'"
+</code></pre></div></div>
+
+<h2 id="was-that-so-bad">Was that so bad?</h2>
+
+<p>Pages designed for humans are increasingly harder to parse programmatically.</p>
+
+<ul>
+  <li>Servers provide different responses based on client “metadata”</li>
+  <li>JavaScript often needs to be executed by the client</li>
+  <li>The HTML <code class="language-plaintext highlighter-rouge">&lt;table&gt;</code> is drifting into obscurity (mostly for the better)</li>
+</ul>
+
+<h2 id="html-tables">HTML Tables</h2>
+
+<p>Sites with easily accessible html tables nowadays may be specifically
+intended to be parsed programmatically, rather than browsed by a human reader. 
+The US Census provides some documentation for their data services in a massive table:</p>
+
+<p><a href="https://api.census.gov/data/2017/acs/acs5/variables.html">https://api.census.gov/data/2017/acs/acs5/variables.html</a></p>
+
+<div class="language-python input highlighter-rouge" title="Console"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="o">+</span> 
+<span class="o">+</span> <span class="nb">vars</span> <span class="o">=</span> <span class="p">(</span>
+<span class="o">+</span>   <span class="n">pd</span>
+<span class="o">+</span>   <span class="p">.</span><span class="n">read_html</span><span class="p">(</span><span class="s">'https://api.census.gov/data/2017/acs/acs5/variables.html'</span><span class="p">)</span>
+<span class="o">+</span>   <span class="p">.</span><span class="n">pop</span><span class="p">()</span>
+<span class="o">+</span> <span class="p">)</span>
+<span class="o">+</span> <span class="nb">vars</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>          Name            Label  ...   Group Unnamed: 8
+0       AIANHH        Geography  ...     NaN        NaN
+1       AIHHTL        Geography  ...     NaN        NaN
+2        AIRES        Geography  ...     NaN        NaN
+3         ANRC        Geography  ...     NaN        NaN
+4  B00001_001E  Estimate!!Total  ...  B00001        NaN
+
+[5 rows x 9 columns]
+</code></pre></div></div>
+
+<p>We can use our data manipulation tools to search this unwieldy
+documentation for variables of interest.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">idx</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="nb">vars</span><span class="p">[</span><span class="s">'Label'</span><span class="p">]</span>
+  <span class="p">.</span><span class="nb">str</span>
+  <span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">'Median household income'</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="nb">vars</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">[</span><span class="s">'Name'</span><span class="p">,</span> <span class="s">'Label'</span><span class="p">]]</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>               Name                                              Label
+11214   B19013_001E  Estimate!!Median household income in the past ...
+11215  B19013A_001E  Estimate!!Median household income in the past ...
+11216  B19013B_001E  Estimate!!Median household income in the past ...
+11217  B19013C_001E  Estimate!!Median household income in the past ...
+11218  B19013D_001E  Estimate!!Median household income in the past ...
+11219  B19013E_001E  Estimate!!Median household income in the past ...
+11220  B19013F_001E  Estimate!!Median household income in the past ...
+11221  B19013G_001E  Estimate!!Median household income in the past ...
+11222  B19013H_001E  Estimate!!Median household income in the past ...
+11223  B19013I_001E  Estimate!!Median household income in the past ...
+11932   B19049_001E  Estimate!!Median household income in the past ...
+11933   B19049_002E  Estimate!!Median household income in the past ...
+11934   B19049_003E  Estimate!!Median household income in the past ...
+11935   B19049_004E  Estimate!!Median household income in the past ...
+11936   B19049_005E  Estimate!!Median household income in the past ...
+19332   B25099_001E           Estimate!!Median household income!!Total
+19333   B25099_002E  Estimate!!Median household income!!Total!!Medi...
+19334   B25099_003E  Estimate!!Median household income!!Total!!Medi...
+19643   B25119_001E  Estimate!!Median household income in the past ...
+19644   B25119_002E  Estimate!!Median household income in the past ...
+19645   B25119_003E  Estimate!!Median household income in the past ...
+</code></pre></div></div>
+
+<p class="ToS"><a href="#/slides/scrape">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/api"></a></p>
+
+<h2 id="web-services">Web Services</h2>
+
+<p>The US Census Bureau provides access to its vast stores of demographic
+data over the Web via their API at <a href="https://api.census.gov">https://api.census.gov</a>.</p>
+
+<p>The <strong>I</strong> in <strong>GUI</strong> is for interface—it’s the same in <strong>API</strong>, where buttons
+and drop-down menus are replaced by functions and object attributes.</p>
+
+<p class="notes">Instead of interfacing with a user, this kind of <strong>i</strong>nterface is suitable for
+use in <strong>p</strong>rogramming another software <strong>a</strong>pplication. In the case of the
+Census, the main component of the application is some relational database
+management system. There are several GUIs designed for humans to
+query the Census database; the Census API is meant for communication between
+your program (i.e. script) and their application.</p>
+
+<p class="notes">You’ll often see the acronym “REST API.” In this context, <strong>REST</strong> stands for
+<strong>Re</strong>presentational <strong>s</strong>tate <strong>t</strong>ransfer. This refers to a set of standards that
+help ensure that the Web service works well with any computer system it 
+may interact with.</p>
+
+<p>Inspect <a href="https://api.census.gov/data/2015/acs5?get=NAME&amp;for=county&amp;in=state:24#irrelephant" target="_blank">this URL</a> in your browser.</p>
+
+<p class="notes">In a web service, the already universal system for
+transferring data over the internet, known as HTTP, is half of the
+interface. All you really need is documentation for how to construct
+the URL in a standards-compliant way that the service will recognize.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Section</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">https://</code></td>
+      <td><strong>scheme</strong></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">api.census.gov</code></td>
+      <td><strong>authority</strong>, or simply domain if there’s no user authentication</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/data/2015/acs5</code></td>
+      <td><strong>path</strong> to a resource within a hierarchy</td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">?</code></td>
+      <td>beginning of the <strong>query</strong> component of a URL</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">get=NAME</code></td>
+      <td>first query parameter</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">&amp;</code></td>
+      <td>query parameter separator</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">for=county</code></td>
+      <td>second query parameter</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">&amp;</code></td>
+      <td>query parameter separator</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">in=state:*</code></td>
+      <td>third query parameter</td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">#</code></td>
+      <td>beginning of the <strong>fragment</strong> component of a URL</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">irrelephant</code></td>
+      <td>a document section, it isn’t even sent to the server</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">path</span> <span class="o">=</span> <span class="s">'https://api.census.gov/data/2017/acs/acs5'</span>
+<span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s">'get'</span><span class="p">:</span> <span class="s">'NAME,B19013_001E'</span><span class="p">,</span>
+  <span class="s">'for'</span><span class="p">:</span> <span class="s">'tract:*'</span><span class="p">,</span>
+  <span class="s">'in'</span><span class="p">:</span> <span class="s">'state:24'</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+<span class="n">response</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;Response [200]&gt;
+</code></pre></div></div>
+
+<h2 id="response-header">Response Header</h2>
+
+<p>The response from the API is a bunch of 0s and 1s, but part of the
+HTTP protocol is to include a “header” with information about how
+to decode the body of the response.</p>
+
+<p>Most REST APIs return as the “content” either:</p>
+
+<ol>
+  <li>Javascript Object Notation (JSON)
+    <ul>
+      <li>a UTF-8 encoded string of key-value pairs, where values may be lists</li>
+      <li>e.g. <code class="language-plaintext highlighter-rouge">{'a':24, 'b': ['x', 'y', 'z']}</code></li>
+    </ul>
+  </li>
+  <li>eXtensible Markup Language (XML)
+    <ul>
+      <li>a nested <code class="language-plaintext highlighter-rouge">&lt;tag&gt;&lt;/tag&gt;</code> hierarchy serving the same purpose</li>
+    </ul>
+  </li>
+</ol>
+
+<p>The header from Census says the content type is JSON.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">response</span><span class="p">.</span><span class="n">headers</span><span class="p">[</span><span class="s">'Content-Type'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>'application/json;charset=utf-8'
+</code></pre></div></div>
+
+<h2 id="response-content">Response Content</h2>
+
+<p>Use a JSON reader to extract a Python object. To read it into
+a pandas <code class="language-plaintext highlighter-rouge">DataFrame</code>, use pandas’ <code class="language-plaintext highlighter-rouge">read_json</code>.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">content</span><span class="p">)</span>
+<span class="n">data</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                                                0            1  ...       3       4
+0                                            NAME  B19013_001E  ...  county   tract
+1  Census Tract 105.01, Wicomico County, Maryland        68652  ...     045  010501
+2  Census Tract 5010.02, Carroll County, Maryland        75069  ...     013  501002
+3  Census Tract 5077.04, Carroll County, Maryland        88306  ...     013  507704
+4  Census Tract 5061.02, Carroll County, Maryland        84810  ...     013  506102
+
+[5 rows x 5 columns]
+</code></pre></div></div>
+
+<h2 id="api-keys--limits">API Keys &amp; Limits</h2>
+
+<p>Most servers request good behavior, others enforce it.</p>
+
+<ul>
+  <li>Size of single query</li>
+  <li>Rate of queries (calls per second, or per day)</li>
+  <li>User credentials specified by an API key</li>
+</ul>
+
+<p>From the Census FAQ <a href="https://www.census.gov/data/developers/guidance/api-user-guide.Query_Components.html">What Are the Query Limits?</a>:</p>
+
+<blockquote>
+  <p>You can include up to 50 variables in a single API query and can make
+up to 500 queries per IP address per day…  Please keep in mind that
+all queries from a business or organization having multiple employees
+might employ a proxy service or firewall. This will make all of the
+users of that business or organization appear to have the same IP
+address.</p>
+</blockquote>
+
+<p class="ToS"><a href="#/slides/api">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/census"></a></p>
+
+<h2 id="specialized-packages">Specialized Packages</h2>
+
+<p>The third tier of access to online data is much preferred, if it
+exists: a dedicated package in your programming language’s repository
+(<a href="http://pypi.python.org">PyPI</a> or <a href="http://cran.r-project.org">CRAN</a>).</p>
+
+<ul>
+  <li>Additional guidance on query parameters</li>
+  <li>Returns data in native formats</li>
+  <li>Handles all “encoding” problems</li>
+</ul>
+
+<p>The <a href="" class="pylib">census</a> package is a user-contributed suite of tools
+that streamline access to the API.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">census</span> <span class="kn">import</span> <span class="n">Census</span>
+
+<span class="n">key</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">Census</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="mi">2017</span><span class="p">)</span>
+<span class="n">c</span><span class="p">.</span><span class="n">acs5</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;census.core.ACS5Client object at 0x7efe9cb75b00&gt;
+</code></pre></div></div>
+
+<p>Compared to using the API directly via the <a href="" class="pylib">requests</a> package:</p>
+
+<p><strong>Pros</strong></p>
+<ul>
+  <li>More concise code, quicker development</li>
+  <li>Package documentation (if present) is usually more user-friendly than API documentaion.</li>
+  <li>May allow seamless update if API changes</li>
+</ul>
+
+<p><strong>Cons</strong></p>
+<ul>
+  <li>No guarantee of updates</li>
+  <li>Possibly limited in scope</li>
+</ul>
+
+<p>Query the Census ACS5 (<a href="https://www.census.gov/programs-surveys/acs">American Community Survey</a>) 
+for the variable <code class="language-plaintext highlighter-rouge">B19001_001E</code> (median annual household income,
+in dollars) and each entity’s <code class="language-plaintext highlighter-rouge">NAME</code>.</p>
+
+<p class="notes">The American Community Survey (ACS) is a yearly survey that provides detailed population
+and housing information at fine geographic scale across the United States. Much of the 
+<a href="" class="pylib">census</a> package is dedicated to accessing the ACS data. ACS5 refers to a five-year
+average of the annual surveys.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">variables</span> <span class="o">=</span> <span class="p">(</span><span class="s">'NAME'</span><span class="p">,</span> <span class="s">'B19013_001E'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>This code pulls the variables <code class="language-plaintext highlighter-rouge">NAME</code> and <code class="language-plaintext highlighter-rouge">B19001_001E</code> from all census tracts and all
+counties in the state with ID <code class="language-plaintext highlighter-rouge">24</code> (Maryland). The <a href="" class="pylib">census</a> package converts the JSON string 
+into a Python dictionary. (No need to check headers.)</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">response</span> <span class="o">=</span> <span class="n">c</span><span class="p">.</span><span class="n">acs5</span><span class="p">.</span><span class="n">state_county_tract</span><span class="p">(</span>
+    <span class="n">variables</span><span class="p">,</span>
+    <span class="n">state_fips</span><span class="o">=</span><span class="s">'24'</span><span class="p">,</span>
+    <span class="n">county_fips</span><span class="o">=</span><span class="n">Census</span><span class="p">.</span><span class="n">ALL</span><span class="p">,</span>
+    <span class="n">tract</span><span class="o">=</span><span class="n">Census</span><span class="p">.</span><span class="n">ALL</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'state': '24', 'county': '045', 'tract': '010501', 'NAME': 'Census Tract 105.01, Wicomico County, Maryland', 'B19013_001E': 68652.0}
+</code></pre></div></div>
+
+<p>The Pandas <code class="language-plaintext highlighter-rouge">DataFrame()</code> constructor will accept the list of
+dictionaries as the sole argument, taking column names from “keys”. 
+This code also removes values less than zero.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="n">pd</span>
+  <span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+  <span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s">"B19013_001E &gt;= 0"</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p>The <a href="" class="pylib">seaborn</a> package provides some nice, quick visualizations. Here
+we create boxplots showing the income distribution among census tracts within
+each county in Maryland.</p>
+
+<div class="language-python no-eval text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+
+<span class="n">sns</span><span class="p">.</span><span class="n">boxplot</span><span class="p">(</span>
+  <span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">,</span>
+  <span class="n">x</span> <span class="o">=</span> <span class="s">'county'</span><span class="p">,</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="s">'B19013_001E'</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p class="ToS"><a href="#/slides/census">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/rdbms"></a></p>
+
+<h2 id="paging--stashing">Paging &amp; Stashing</h2>
+
+<p>A common strategy that web service providers take to balance their
+load is to limit the number of records a single API request can
+return. The user ends up having to flip through “pages” with the API,
+handling the response content at each iteration. Options for stashing
+data are:</p>
+
+<ol>
+  <li>Store it all in memory, write to file at the end.</li>
+  <li>Append each response to a file, writing frequently.</li>
+  <li>Offload these decisions to database management software.</li>
+</ol>
+
+<p class="notes">The <a href="https://www.data.gov">data.gov</a> API provides a case in point. 
+Data.gov is a service provided by the U.S. federal government to make data available
+from across many government agencies. It hosts a catalog of raw data and of many other
+APIs from across government.
+Among the APIs catalogued by data.gov is the <a href="https://fdc.nal.usda.gov/">FoodData Central</a> API.
+The U.S. Department of Agriculture maintains a data system of nutrition information 
+for thousands of foods. 
+We might be interested in the relative nutrient content of different fruits.</p>
+
+<p class="notes">To repeat the exercise below at home, request an API key at
+https://api.data.gov/signup/, and store it in a file named <code class="language-plaintext highlighter-rouge">api_key.py</code>
+in your working directory. The file should contain the single line 
+<code class="language-plaintext highlighter-rouge">API_KEY = your many digit key</code>.</p>
+
+<p>Load the <code class="language-plaintext highlighter-rouge">API_KEY</code> variable by importing it from the file you saved it in.</p>
+
+<div class="language-python input highlighter-rouge" title="Console"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="kn">from</span> <span class="nn">api_key</span> <span class="kn">import</span> <span class="n">API_KEY</span>
+</code></pre></div></div>
+
+<p>Run an API query for all foods with <code class="language-plaintext highlighter-rouge">"fruit"</code> in their name.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">api</span> <span class="o">=</span> <span class="s">'https://api.nal.usda.gov/fdc/v1/'</span>
+<span class="n">path</span> <span class="o">=</span> <span class="s">'foods/search'</span>
+<span class="n">query</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'api_key'</span><span class="p">:</span><span class="n">API_KEY</span><span class="p">,</span>
+    <span class="s">'query'</span><span class="p">:</span><span class="s">'fruit'</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">response</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">requests</span>
+    <span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">api</span> <span class="o">+</span> <span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">doc</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>Extract data from the returned JSON object, which gets mapped to a
+Python dictionary called <code class="language-plaintext highlighter-rouge">doc</code>. To inspect the return, we can list 
+the dictionary keys.</p>
+
+<div class="language-python input highlighter-rouge" title="Console"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="n">doc</span><span class="p">.</span><span class="n">keys</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['foods', 'foodSearchCriteria', 'totalHits', 'currentPage', 'totalPages']
+</code></pre></div></div>
+
+<p>We can print the value associated with the key <code class="language-plaintext highlighter-rouge">totalHits</code> to see
+how many foods matched our search term, <code class="language-plaintext highlighter-rouge">"fruit"</code>.</p>
+
+<div class="language-python input highlighter-rouge" title="Console"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="n">doc</span><span class="p">[</span><span class="s">'totalHits'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>18801
+</code></pre></div></div>
+
+<p>The purported claimed number of results is much larger than the length
+of the <code class="language-plaintext highlighter-rouge">foods</code> array contained in this response. The query returned only the
+first page, with 50 items.</p>
+
+<div class="language-python input highlighter-rouge" title="Console"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s">'foods'</span><span class="p">])</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>50
+</code></pre></div></div>
+
+<p>The following commands prepare Python to connect to a
+database-in-a-file, and create empty tables in the database if they
+do not already exist (meaning that it is safe to re-run after you have
+populated the database).</p>
+
+<h3 id="step-1-boilerplate">Step 1: Boilerplate</h3>
+
+<p>The SQLAlchemy package has a lot of features, and
+requires you to be very precise about how to get started.</p>
+
+<div class="language-python no-eval text-document highlighter-rouge" title="schema.py"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="step-2-table-definition">Step 2: Table Definition</h3>
+
+<p>Define the tables that are going to live in the database
+using Python classes. For each class, its attributes
+will map to columns in a table. Then create a session engine.</p>
+
+<div class="language-python no-eval text-document highlighter-rouge" title="schema.py"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">Numeric</span>
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">Food</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">'food'</span>
+    
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+    <span class="n">sugar</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Numeric</span><span class="p">)</span>
+    
+<span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s">'sqlite:///fruits.db'</span><span class="p">)</span>
+<span class="n">Base</span><span class="p">.</span><span class="n">metadata</span><span class="p">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+<span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>For each fruit, we’ll store its name and the amount of sugar
+(grams of sugar per 100 grams of fruit) found in the API response.</p>
+
+<div class="language-python input highlighter-rouge" title="Console"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="n">fruit</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="s">'foods'</span><span class="p">].</span><span class="n">pop</span><span class="p">()</span>
+<span class="o">+</span> <span class="n">fruit</span><span class="p">[</span><span class="s">'description'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>'Fruit peel, candied'
+</code></pre></div></div>
+
+<p>Extract the names and values of the first ten nutrients for the first item returned by the query.</p>
+
+<div class="language-python input highlighter-rouge" title="Console"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="p">[</span> <span class="p">(</span><span class="n">nutrient</span><span class="p">[</span><span class="s">'nutrientName'</span><span class="p">],</span> <span class="n">nutrient</span><span class="p">[</span><span class="s">'value'</span><span class="p">])</span> <span class="k">for</span> <span class="n">nutrient</span> <span class="ow">in</span> <span class="n">fruit</span><span class="p">[</span><span class="s">'foodNutrients'</span><span class="p">][:</span><span class="mi">9</span><span class="p">]</span> <span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[('Protein', 0.34), ('Total lipid (fat)', 0.07), ('Carbohydrate, by difference', 82.74), ('Energy', 322.0), ('Alcohol, ethyl', 0.0), ('Water', 16.7), ('Caffeine', 0.0), ('Theobromine', 0.0), ('Sugars, total including NLEA', 80.68)]
+</code></pre></div></div>
+
+<h3 id="step-3-connect-and-initialize">Step 3: Connect (and Initialize)</h3>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">schema</span> <span class="kn">import</span> <span class="n">Session</span><span class="p">,</span> <span class="n">Food</span>
+
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="n">engine</span> <span class="o">=</span> <span class="n">session</span><span class="p">.</span><span class="n">bind</span>
+</code></pre></div></div>
+
+<p>You could inspect the fruit database now using any sqlite3 client: you
+would find one empty “food” table with fields “id”, “name”, and “sugar”.</p>
+
+<p>Add a new <code class="language-plaintext highlighter-rouge">pageSize</code> parameter to request <code class="language-plaintext highlighter-rouge">100</code> documents per page.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">query</span><span class="p">[</span><span class="s">'pageSize'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+</code></pre></div></div>
+
+<p>In each request, advance the query parameter <code class="language-plaintext highlighter-rouge">pageNumber</code> by one. 
+The first record retrieved will be <code class="language-plaintext highlighter-rouge">pageNumber * pageSize</code>. 
+Insert the fruits (the key:value pairs stored in <code class="language-plaintext highlighter-rouge">values</code>) 
+in bulk to the database with <code class="language-plaintext highlighter-rouge">engine.execute()</code>.</p>
+
+<p class="notes">In each iteration of the loop, we use a list comprehension to
+extract the value corresponding to the amount of sugar from each
+of the foods in the page of results returned by the query.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">table</span> <span class="o">=</span> <span class="n">Food</span><span class="p">.</span><span class="n">metadata</span><span class="p">.</span><span class="n">tables</span><span class="p">[</span><span class="s">'food'</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+    
+    <span class="c1"># advance page and query
+</span>    <span class="n">query</span><span class="p">[</span><span class="s">'pageNumber'</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> 
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">api</span> <span class="o">+</span> <span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="n">fruits</span> <span class="o">=</span> <span class="n">page</span><span class="p">[</span><span class="s">'foods'</span><span class="p">]</span>
+    
+    <span class="c1"># save page with session engine
+</span>    <span class="n">values</span> <span class="o">=</span> <span class="p">[{</span><span class="s">'name'</span><span class="p">:</span> <span class="n">fruit</span><span class="p">[</span><span class="s">'description'</span><span class="p">],</span>
+               <span class="s">'sugar'</span><span class="p">:</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">([</span> <span class="n">nutrient</span><span class="p">[</span><span class="s">'value'</span><span class="p">]</span> <span class="k">for</span> <span class="n">nutrient</span> <span class="ow">in</span> <span class="n">fruit</span><span class="p">[</span><span class="s">'foodNutrients'</span><span class="p">]</span> <span class="k">if</span> <span class="n">nutrient</span><span class="p">[</span><span class="s">'nutrientName'</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s">'Sugar'</span> <span class="p">]),</span> <span class="bp">None</span><span class="p">)</span> <span class="p">}</span> <span class="k">for</span> <span class="n">fruit</span> <span class="ow">in</span> <span class="n">fruits</span><span class="p">]</span>
+               
+    <span class="n">insert</span> <span class="o">=</span> <span class="n">table</span><span class="p">.</span><span class="n">insert</span><span class="p">().</span><span class="n">values</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">engine</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">insert</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext output highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;sqlalchemy.engine.result.ResultProxy object at 0x7efe9b686da0&gt;
+&lt;sqlalchemy.engine.result.ResultProxy object at 0x7efe9b492f60&gt;
+&lt;sqlalchemy.engine.result.ResultProxy object at 0x7efe9db07160&gt;
+&lt;sqlalchemy.engine.result.ResultProxy object at 0x7efe9dda33c8&gt;
+&lt;sqlalchemy.engine.result.ResultProxy object at 0x7efe9db07cc0&gt;
+&lt;sqlalchemy.engine.result.ResultProxy object at 0x7efe9dda7630&gt;
+&lt;sqlalchemy.engine.result.ResultProxy object at 0x7efe9da90cc0&gt;
+&lt;sqlalchemy.engine.result.ResultProxy object at 0x7efe9ddb05f8&gt;
+&lt;sqlalchemy.engine.result.ResultProxy object at 0x7efe9da9ad68&gt;
+&lt;sqlalchemy.engine.result.ResultProxy object at 0x7efe9ddb2278&gt;
+</code></pre></div></div>
+
+<p>View the records in the database by reading
+everything we have so far back into a <code class="language-plaintext highlighter-rouge">DataFrame</code>.</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_sql_table</span><span class="p">(</span><span class="s">'food'</span><span class="p">,</span> <span class="n">engine</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Don’t forget to disconnect from your database!</p>
+
+<div class="language-python text-document highlighter-rouge" title="worksheet-13.ipynb"><div class="highlight"><pre class="highlight"><code><span class="n">engine</span><span class="p">.</span><span class="n">dispose</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p class="ToS"><a href="#/slides/rdbms">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/conclude"></a></p>
+
+<h2 id="takeaway">Takeaway</h2>
+
+<ul>
+  <li>
+    <p>Web scraping is hard and unreliable, but sometimes there is no other option.</p>
+  </li>
+  <li>
+    <p>Web services are the most common resource.</p>
+  </li>
+  <li>
+    <p>Search <a href="https://pypi.org">PyPI</a> for an API you plan to use.</p>
+  </li>
+</ul>
+
+<p class="notes">Web services do not always have great documentation—what parameters are
+acceptable or necessary may not be clear. Some may even be poorly documented on
+purpose if the API wasn’t designed for public use! Even if you plan to acquire
+data using the “raw” web service, try a search for a relevant package on Python.
+The package documentation could help.</p>
+
+<p class="ToS"><a href="#/slides/conclude">Top of Section</a></p>
+
+<hr />
+<p><a name="/slides/exercise"></a></p>
+
+<h2 id="exercises">Exercises</h2>
+
+<h3 id="exercise-1">Exercise 1</h3>
+
+<p>Identify the name of the census variable in the table of ACS variables whose
+label includes “COUNT OF THE POPULATION”. Next, use the Census API to collect
+the data for this variable, for every county in the U.S. state with FIPS code
+‘24’, into a <a href="" class="pylib">pandas</a> DataFrame.</p>
+
+<h3 id="exercise-2">Exercise 2</h3>
+
+<p>Request an <a href="https://api.data.gov/signup/">API key for data.gov</a>, which will enable you to access the FoodData
+Central API. Use the API to collect 3 “pages” of food results matching a search 
+term of your choice. Modify <code class="language-plaintext highlighter-rouge">schema.py</code> to save the names and sugar contents of the
+foods into a new SQLite file.</p>
+
+<p class="ToS"><a href="#/slides/exercise">Top of Section</a></p>
+
+
+
+        <hr>
+
+<p>If you need to catch-up before a section of code will work, just squish it's
+🍅 to copy code above it into your clipboard. Then paste into your interpreter's
+console, run, and you'll be ready to start in on that section. Code copied by
+both 🍅 and 📋 will also appear below, where you can edit first, and then copy,
+paste, and run again.</p>
+
+<div class="output">
+  <pre id="ketchup" contenteditable="true"><code># Nothing here yet!</code></pre>
+</div>
+
+<script>
+$(document).ready(function(){
+  
+  // Add code help icons to code blocks
+  $('.input, .text-document').append('<ul class="code-help">');
+  $('.code-help')
+    .append('<li class="clipboard">📋</li>');
+  $('.text-document:not(.no-eval) .code-help')
+    .append('<li class="ketchup">🍅</li>');
+
+  // Bind copy actions to mouse clicks on icons
+  var $ketchup = $('#ketchup');
+  var rng = document.createRange();
+  var sel = window.getSelection();
+  $('.ketchup').click(function(){
+    var $prev = $(this)
+      .parents('.text-document')
+      .prevAll('.text-document:has(.ketchup)');
+    $ketchup.find('code').text($prev.find('pre').text());
+    rng.selectNodeContents($ketchup[0]);
+    sel.removeAllRanges();
+    sel.addRange(rng);
+    document.execCommand("copy");
+    sel.removeAllRanges();
+  });
+  $('.text-document .clipboard').click(function(){
+    var pre = $(this).parents('.text-document').find('pre').text();
+    $ketchup.find('code').text(pre);
+    rng.selectNodeContents($ketchup[0]);
+    sel.removeAllRanges();
+    sel.addRange(rng);
+    document.execCommand("copy");
+    sel.removeAllRanges();
+  });
+  $('.input .clipboard').click(function(){
+    var pre = $(this).parents('.input').find('pre').text();
+    pre = pre.replace(/(^|\n)[>+] /g, '$1');
+    $ketchup.find('code').text(pre);
+    rng.selectNodeContents($ketchup[0]);
+    sel.removeAllRanges();
+    sel.addRange(rng);
+    document.execCommand("copy");
+    sel.removeAllRanges();
+  });
+});
+</script>
+      </div>
+    </div>
+    <script>
+$(document).ready(function(){
+  // Add links to R and Python package repositories
+  $('a.rlib').map(function(){
+    this.href = 'https://cran.r-project.org/package=' + this.innerText;
+  });
+  $('a.pylib').map(function(){
+    this.href = 'https://pypi.python.org/pypi/' + this.innerText;
+  });
+});
+</script>
+
+  </body>
+</html>
