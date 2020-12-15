@@ -1,6 +1,3 @@
-# online-data-lesson
-Acquire data from websites and APIs using Python.
-
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://github.com/SESYNC-ci/sesync-ci.github.io/blob/master/lesson/lesson-lifecycle.md#stable)
 
 ## Online Data Lesson
