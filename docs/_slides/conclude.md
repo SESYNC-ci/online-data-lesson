@@ -15,3 +15,19 @@ purpose if the API wasn't designed for public use! Even if you plan to acquire
 data using the "raw" web service, try a search for a relevant package on Python.
 The package documentation could help.
 {:.notes}
+
+===
+
+For more resources and to discover more APIs visit:
+* [*DataOne*](https://www.dataone.org)
+A network of data repositories making data more accesible and usable.
+    - [Data Discovery](https://search.dataone.org/data)
+    - [metajam](https://nceas.github.io/metajam/)
+
+* [*SODA Developers*](https://dev.socrata.com)
+An open data API to access open data resources from many organizations and governments.
+
+* [*Public APIs*](https://github.com/public-apis/public-apis)
+A repository listing free APIs for use in your research and projects.
+
+===
