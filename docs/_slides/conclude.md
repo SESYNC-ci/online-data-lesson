@@ -18,11 +18,11 @@ The package documentation could help.
 
 ===
 
-For more resources and to discover more APIs visit:
+For more resources, and to discover more APIs, visit:
+
 * [*DataOne*](https://www.dataone.org)  
-A network of data repositories making data more accesible and usable.
-    - [Data Discovery](https://search.dataone.org/data)
-    - [metajam](https://nceas.github.io/metajam/)
+A network of data repositories making data more accessible and usable.
+    - [Data Discovery](https://search.dataone.org/data): Portal to search DataOne
 
 * [*SODA Developers*](https://dev.socrata.com)  
 An open data API to access open data resources from many organizations and governments.
