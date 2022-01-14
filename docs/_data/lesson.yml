@@ -8,7 +8,7 @@ instructor:
 lifecycle: stable # status for lifecycle badge
 badgecolor: green # color for lifecycle badge
 warning: false # whether to include note about lifecycle status
-doi: 10.5281/zenodo.5710852
+doi: 10.5281/zenodo.5710851
 authors:
   - Ian Carroll
 sorter:
