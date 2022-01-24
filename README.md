@@ -1,5 +1,5 @@
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://github.com/SESYNC-ci/sesync-ci.github.io/blob/master/lesson/lesson-lifecycle.md#stable)
-[![DOI](https://zenodo.org/badge/98349358.svg)](https://zenodo.org/badge/latestdoi/98349358)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5710851.svg)](https://doi.org/10.5281/zenodo.5710851)
 
 ## Online Data Lesson
 
